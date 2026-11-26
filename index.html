@@ -1,0 +1,3235 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StyleFit AI — 個人專屬造型師與智慧衣櫥</title>
+    <!-- Google Fonts: Noto Serif TC & Noto Sans TC -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans TC"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        serif: ['"Noto Serif TC"', 'Georgia', 'serif']
+                    },
+                    colors: {
+                        editorialBg: '#FAF9F6',
+                        editorialCard: '#FFFFFF',
+                        editorialBorder: '#E7E4DD',
+                        editorialText: '#18181B',
+                        editorialMuted: '#71717A',
+                        editorialAccent: '#B85D3B',
+                        editorialAccentHover: '#9A4A2C',
+                        editorialSand: '#F2EFE9'
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        body {
+            background-color: #FAF9F6;
+            color: #18181B;
+            -webkit-font-smoothing: antialiased;
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .card-hover {
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(24, 24, 27, 0.06);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- 全域提示訊息膠囊 (Toast) -->
+    <div id="global-toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden max-w-md w-[92%] sm:w-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium flex items-center gap-2.5 transition-all duration-200 bg-editorialText text-white border-zinc-700">
+        <span id="global-toast-icon">✨</span>
+        <span id="global-toast-msg" class="leading-snug">系統就緒</span>
+    </div>
+
+    <!-- 隱藏的全域輔助檔案輸入器（補傳背面照 / 匯入 JSON 備份） -->
+    <input type="file" id="global-supplement-back-input" accept="image/*" class="hidden">
+    <input type="file" id="global-import-json-input" accept=".json,application/json" class="hidden">
+
+    <!-- 頂部導覽列 -->
+    <header class="sticky top-0 z-30 bg-editorialBg/95 backdrop-blur-md border-b border-editorialBorder">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+                <!-- 品牌標題 -->
+                <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-xl bg-editorialText text-white flex items-center justify-center font-serif font-bold text-lg shadow-sm">S</div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 class="font-serif font-bold text-base sm:text-lg tracking-tight text-editorialText">StyleFit AI</h1>
+                            <span id="header-storage-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span>UltraDB 二進位圖庫</span>
+                            </span>
+                        </div>
+                        <p class="text-[11px] text-editorialMuted">個人專屬造型師與超大容量智慧衣櫥</p>
+                    </div>
+                </div>
+
+                <!-- 右側工具按鈕列 -->
+                <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <button type="button" onclick="openModal('profile-modal')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-editorialSand hover:bg-stone-200/80 border border-editorialBorder text-xs font-semibold text-editorialText transition">
+                        <span class="w-2 h-2 rounded-full bg-editorialAccent"></span>
+                        <span id="header-profile-pill">169 cm · S/M 碼 · 褲長蓋鞋舌</span>
+                    </button>
+                    <button type="button" onclick="openModal('backup-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition" title="匯出或還原衣櫥 JSON 備份">
+                        <span>💾 備份/還原</span>
+                    </button>
+                    <button type="button" onclick="openModal('apikey-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition" title="設定 Gemini API 金鑰">
+                        <span>🔑 API</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 大核心工作區分頁切換 -->
+            <nav class="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+                <button type="button" data-tab="today" onclick="switchTab('today')" class="main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-editorialText text-white whitespace-nowrap transition">
+                    ⚡ 今日出門 &amp; 急診
+                </button>
+                <button type="button" data-tab="wardrobe" onclick="switchTab('wardrobe')" class="main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-editorialCard text-editorialText border border-editorialBorder hover:bg-editorialSand whitespace-nowrap transition">
+                    👗 我的數位衣櫥 <span id="nav-wardrobe-count" class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] bg-editorialSand text-editorialText font-bold">0</span>
+                </button>
+                <button type="button" data-tab="studio" onclick="switchTab('studio')" class="main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-editorialCard text-editorialText border border-editorialBorder hover:bg-editorialSand whitespace-nowrap transition">
+                    🎨 造型工坊 &amp; 週曆
+                </button>
+                <button type="button" data-tab="lab" onclick="switchTab('lab')" class="main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-editorialCard text-editorialText border border-editorialBorder hover:bg-editorialSand whitespace-nowrap transition">
+                    🔍 實拍診斷 · 滅火 · 打包
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 主內容區 -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+        <!-- ===================================================================== -->
+        <!-- 分頁 1：⚡ 今日出門 & 急診 -->
+        <!-- ===================================================================== -->
+        <section id="tab-today" class="tab-panel grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- 左欄：今日出門決策台 -->
+            <div class="lg:col-span-5 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
+                <div class="flex items-start justify-between gap-2">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">DAILY OUTFIT &amp; SCENT</span>
+                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">今日出門決策台</h2>
+                    </div>
+                    <span id="temp-dynamic-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                        溫差 6°C · 洋蔥式穿脫
+                    </span>
+                </div>
+
+                <!-- 氣溫數值區間步進器 -->
+                <div class="p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-editorialText">今日氣溫區間 (°C)</span>
+                        <span class="text-[11px] text-editorialMuted">依最低溫選外套、最高溫定內搭</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-editorialCard rounded-xl p-2.5 border border-editorialBorder">
+                            <label for="temp-min-input" class="block text-[10px] font-semibold text-editorialMuted mb-1">最低溫 (°C)</label>
+                            <div class="flex items-center justify-between gap-1">
+                                <button type="button" onclick="adjustTemp('min', -1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">−</button>
+                                <input type="number" id="temp-min-input" value="16" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
+                                <button type="button" onclick="adjustTemp('min', 1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">+</button>
+                            </div>
+                        </div>
+                        <div class="bg-editorialCard rounded-xl p-2.5 border border-editorialBorder">
+                            <label for="temp-max-input" class="block text-[10px] font-semibold text-editorialMuted mb-1">最高溫 (°C)</label>
+                            <div class="flex items-center justify-between gap-1">
+                                <button type="button" onclick="adjustTemp('max', -1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">−</button>
+                                <input type="number" id="temp-max-input" value="22" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
+                                <button type="button" onclick="adjustTemp('max', 1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 自由文字行程輸入 -->
+                <div class="space-y-1.5">
+                    <label for="today-itinerary-input" class="block text-xs font-bold text-editorialText">今日真實行程與細節（自由輸入）</label>
+                    <textarea id="today-itinerary-input" rows="3" placeholder="直接打字輸入今天要去哪、見誰或在意的小細節，例如：早上在教室上課冷氣強，下午要去逛街拍照，晚上跟朋友吃燒肉不想外套沾油煙味..." class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
+                </div>
+
+                <!-- 隨身香水選擇 -->
+                <div class="space-y-1.5">
+                    <label for="today-perfume-select" class="block text-xs font-bold text-editorialText">今日搭配香水（防材質損傷點位計算）</label>
+                    <select id="today-perfume-select" class="w-full rounded-2xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-sm font-medium text-editorialText focus:outline-none focus:border-editorialText">
+                        <option value="大吉嶺淡香精（茶香木質調）">大吉嶺淡香精（清冷茶香木質調）</option>
+                        <option value="悟香水（柑橘羅勒草本調）">悟香水（清爽柑橘羅勒調）</option>
+                        <option value="一生之鹽（海洋礦物木質調）">一生之鹽（乾淨海洋木質調）</option>
+                        <option value="不噴香水">今日不噴香水</option>
+                    </select>
+                </div>
+
+                <button type="button" id="btn-generate-today" onclick="generateTodayOutfitPlan()" class="w-full py-3.5 px-4 rounded-2xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-sm shadow-sm transition flex items-center justify-center gap-2">
+                    <span>✨ 生成今日衣櫥配方與香水點位</span>
+                </button>
+
+                <!-- 今日推播結果區塊 -->
+                <div id="today-result-box" class="hidden space-y-3 pt-2 border-t border-editorialBorder">
+                    <div class="p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-editorialAccent">🧥 今日洋蔥式穿搭配方</span>
+                            <span id="today-source-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-editorialSand text-editorialMuted font-semibold">衣櫥智慧匹配</span>
+                        </div>
+                        <p id="today-outfit-summary" class="text-sm font-bold text-editorialText leading-relaxed"></p>
+                        <p id="today-outfit-reason" class="text-xs text-editorialMuted leading-relaxed"></p>
+                        <div id="today-matched-thumbs" class="flex flex-wrap gap-2 pt-1"></div>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
+                        <div class="text-xs font-bold text-amber-900">🧴 隨身香水精準點位指南（護衣防雷）</div>
+                        <p id="today-perfume-guide" class="text-xs text-amber-950/90 leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右欄：🩺 穿搭急診室 -->
+            <div class="lg:col-span-7 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">PRACTICAL PROBLEM SOLVER</span>
+                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🩺 穿搭急診室（實戰解決引擎）</h2>
+                        <p class="text-xs text-editorialMuted mt-1">拒絕空泛廢話，強制輸出「根源診斷 ＋ 3 套可出門配方 ＋ 30 秒微調 ＋ 地雷避坑」</p>
+                    </div>
+                    <button type="button" onclick="loadWhiteJeansGuidePreset()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText transition">
+                        👖 白色直筒牛仔褲攻略
+                    </button>
+                </div>
+
+                <!-- 急診問題輸入區 -->
+                <div class="space-y-3">
+                    <textarea id="er-question-input" rows="3" placeholder="輸入你現在卡關的具體穿搭問題，例如：我有一件白色直筒牛仔褲，怕穿起來腿短又不知道配什麼外套跟鞋子，我衣櫥裡現有的衣服該怎麼搭才帥？" class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
+
+                    <div class="flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="er-photo-input" accept="image/*" class="hidden" onchange="handleErPhotoUpload(event)">
+                            <button type="button" onclick="getEl('er-photo-input').click()" class="px-3 py-2 rounded-xl bg-editorialBg hover:bg-editorialSand border border-editorialBorder text-xs font-semibold text-editorialText transition">
+                                📷 附帶單品/試穿照（選填）
+                            </button>
+                            <div id="er-photo-badge" class="hidden items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800">
+                                <span>已附照片</span>
+                                <button type="button" onclick="clearErPhoto()" class="font-bold hover:text-rose-600">✕</button>
+                            </div>
+                        </div>
+
+                        <button type="button" id="btn-run-er" onclick="runEmergencyRoomSolver()" class="px-5 py-2.5 rounded-xl bg-editorialAccent hover:bg-editorialAccentHover text-white font-bold text-xs sm:text-sm shadow-sm transition">
+                            🩺 立即開立實戰處方箋
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 急診室 4 大強制輸出板塊 -->
+                <div id="er-output-container" class="space-y-4 pt-2 border-t border-editorialBorder">
+                    <div class="p-4 rounded-2xl bg-rose-50/60 border border-rose-200/80 space-y-1">
+                        <div class="text-xs font-bold text-rose-900">1. 痛點根源精準診斷｜白色直筒牛仔褲（169 cm 比例優化）</div>
+                        <p id="er-diagnosis-text" class="text-xs sm:text-sm text-zinc-800 leading-relaxed">
+                            白色牛仔褲最大的視覺風險在於「淺色橫向膨脹感」與「上半身壓不住重心導致頭輕腳重」，若褲腳堆積在腳踝更會直接截斷腿長。解決關鍵是：<strong>上半身採用深色或高辨識度單品鎖住視覺重心、褲腳維持微蓋鞋舌的俐落長度，並搭配淺灰/純白貼身內著防透色</strong>。
+                        </p>
+                    </div>
+
+                    <div class="space-y-2.5">
+                        <div class="text-xs font-bold text-editorialText">2. 直接可出門的 3 套實戰配方</div>
+                        <div id="er-recipes-list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                            <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
+                                <div>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold mb-1.5">配方 A · Blokecore</span>
+                                    <h4 class="text-xs font-bold text-editorialText">深色球衣 ＋ 白色直筒牛仔褲 ＋ 復古德訓/板鞋</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">深色球衣的隊徽與線條能穩穩壓住上半身重心，白褲把球衣競技感轉化為高級街頭休閒風。</p>
+                                </div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
+                                <div>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold mb-1.5">配方 B · City Boy</span>
+                                    <h4 class="text-xs font-bold text-editorialText">重磅連帽外套 ＋ 內搭白 T 微露下擺 ＋ 白褲</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">靠連帽外套的帽型與挺度把視線往上拉高，內搭白 T 下擺微露 2 公分製造乾淨層次。</p>
+                                </div>
+                            </div>
+                            <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
+                                <div>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold mb-1.5">配方 C · Ivy 微正裝</span>
+                                    <h4 class="text-xs font-bold text-editorialText">水藍牛津襯衫 ＋ 白色直筒牛仔褲 ＋ 黑色皮鞋/靴</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">水藍與純白是最顯氣色的高級配色，腳踩黑色鞋靴收尾增加份量感，瞬間穿出大人感。</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1.5">
+                            <div class="text-xs font-bold text-emerald-900">3. 30 秒實穿微調指令（How to Wear）</div>
+                            <ul id="er-tweaks-list" class="text-xs text-emerald-950/90 space-y-1 list-disc list-inside leading-relaxed">
+                                <li>褲腳長度維持「微蓋鞋舌」，絕不反摺成厚重一圈堆在腳踝。</li>
+                                <li>上衣下擺落在胯骨中段，若上衣偏長將前擺微紮進褲頭露出腰線。</li>
+                                <li>若外罩立領毛外套，拉鍊拉至胸口並將領片外翻，拉長頸部比例。</li>
+                            </ul>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-zinc-900 text-zinc-100 space-y-1.5">
+                            <div class="text-xs font-bold text-amber-400">4. 絕對地雷避坑清單（Don'ts）</div>
+                            <ul id="er-donts-list" class="text-xs text-zinc-300 space-y-1 list-disc list-inside leading-relaxed">
+                                <li>嚴禁搭配黑色或高對比深色印花內褲（白褲在強光下極易透出輪廓）。</li>
+                                <li>避免上半身穿過於貼身且無磅數的薄透淺色 T 恤，容易顯單薄。</li>
+                                <li>大吉嶺或木質香水請噴耳後與鎖骨皮膚，避開球衣燙印與毛外套絨毛。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- 分頁 2：👗 我的數位衣櫥 -->
+        <!-- ===================================================================== -->
+        <section id="tab-wardrobe" class="tab-panel hidden space-y-6">
+
+            <!-- 頂部 4 張 KPI 卡片 -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div class="bg-editorialCard rounded-2xl p-4 border border-editorialBorder">
+                    <div class="text-[11px] font-medium text-editorialMuted">衣櫥總收納件數</div>
+                    <div id="kpi-total-items" class="text-xl sm:text-2xl font-bold text-editorialText mt-1">0 件</div>
+                    <div class="text-[10px] text-editorialMuted mt-0.5">正反面雙照合併計為 1 件</div>
+                </div>
+                <div class="bg-editorialCard rounded-2xl p-4 border border-editorialBorder">
+                    <div class="text-[11px] font-medium text-editorialMuted">已標價衣櫥總值</div>
+                    <div id="kpi-total-value" class="text-xl sm:text-2xl font-bold text-editorialText mt-1">尚未標價</div>
+                    <div class="text-[10px] text-editorialMuted mt-0.5">價格選填，僅加總已填單品</div>
+                </div>
+                <div class="bg-editorialCard rounded-2xl p-4 border border-editorialBorder">
+                    <div class="text-[11px] font-medium text-editorialMuted">待洗護保養提醒</div>
+                    <div id="kpi-wash-count" class="text-xl sm:text-2xl font-bold text-editorialAccent mt-1">0 件</div>
+                    <div class="text-[10px] text-editorialMuted mt-0.5">達到穿著閾值自動亮燈</div>
+                </div>
+                <div class="bg-editorialCard rounded-2xl p-4 border border-editorialBorder">
+                    <div class="text-[11px] font-medium text-editorialMuted">UltraDB 二進位大容量庫</div>
+                    <div id="kpi-capacity" class="text-base sm:text-lg font-bold text-emerald-700 mt-1">已用 0.00 MB</div>
+                    <div id="kpi-capacity-sub" class="text-[10px] text-editorialMuted mt-0.5">可輕鬆收納 1,000+ 件雙照</div>
+                </div>
+            </div>
+
+            <!-- 📊 衣櫥使用率診斷 -->
+            <div class="bg-editorialCard rounded-2xl p-4 sm:p-5 border border-editorialBorder flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1">
+                    <div class="p-3 rounded-xl bg-editorialBg border border-editorialBorder">
+                        <div class="text-[11px] font-bold text-emerald-800">🏆 最常翻牌 MVP 單品</div>
+                        <div id="analytics-mvp-text" class="text-xs font-semibold text-editorialText mt-1">尚無穿著紀錄（建檔後穿 0 次起算）</div>
+                    </div>
+                    <div class="p-3 rounded-xl bg-editorialBg border border-editorialBorder">
+                        <div class="text-[11px] font-bold text-amber-800">🧊 穿 0 次冷宮潛力單品</div>
+                        <div id="analytics-cold-text" class="text-xs font-semibold text-editorialText mt-1">上傳衣物後將自動追蹤使用率</div>
+                    </div>
+                </div>
+                <button type="button" onclick="rescueColdWardrobeItem()" class="px-4 py-2.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText whitespace-nowrap transition">
+                    ✨ AI 幫我救活冷宮單品
+                </button>
+            </div>
+
+            <!-- 分類篩選器、關鍵字搜尋與操作按鈕列 -->
+            <div class="bg-editorialCard rounded-2xl p-4 border border-editorialBorder space-y-3">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-1.5">
+                        <button type="button" data-cat="all" onclick="setWardrobeFilter('all')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-bold bg-editorialText text-white">全部</button>
+                        <button type="button" data-cat="top" onclick="setWardrobeFilter('top')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">上衣</button>
+                        <button type="button" data-cat="outerwear" onclick="setWardrobeFilter('outerwear')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">外套</button>
+                        <button type="button" data-cat="bottom" onclick="setWardrobeFilter('bottom')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">下身</button>
+                        <button type="button" data-cat="underwear" onclick="setWardrobeFilter('underwear')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">內褲</button>
+                        <button type="button" data-cat="socks" onclick="setWardrobeFilter('socks')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">襪子</button>
+                        <button type="button" data-cat="shoes" onclick="setWardrobeFilter('shoes')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">鞋子</button>
+                        <button type="button" data-cat="accessory" onclick="setWardrobeFilter('accessory')" class="w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand">配件</button>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button type="button" onclick="toggleAddSingleCard(true)" class="px-3.5 py-2 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-semibold transition">
+                            + 新增單品（正反面雙照）
+                        </button>
+                        <button type="button" onclick="openModal('batch-modal')" class="px-3.5 py-2 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-editorialText text-xs font-semibold transition">
+                            📦 多圖批次匯入
+                        </button>
+                        <button type="button" id="btn-bulk-ai-wardrobe" onclick="runBulkAiRecognizeWardrobe()" class="px-3.5 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-bold transition">
+                            ✨ 一鍵 AI 辨識未命名衣物
+                        </button>
+                        <button type="button" onclick="confirmClearAllWardrobe()" class="px-3 py-2 rounded-xl bg-editorialCard hover:bg-rose-50 border border-editorialBorder text-rose-600 text-xs font-semibold transition">
+                            🗑️ 清空全部
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 批次 AI 辨識進度橫幅 -->
+                <div id="wardrobe-ai-queue-banner" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-300 flex flex-wrap items-center justify-between gap-3">
+                    <div class="space-y-1 flex-1 min-w-[200px]">
+                        <div id="wardrobe-ai-queue-status" class="text-xs font-bold text-amber-950">正在排隊辨識衣物...</div>
+                        <div class="w-full h-2 rounded-full bg-amber-200/70 overflow-hidden">
+                            <div id="wardrobe-ai-queue-bar" class="h-full bg-editorialAccent transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="stopBulkAiRecognizeWardrobe()" class="px-3 py-1.5 rounded-xl bg-white border border-amber-300 text-xs font-bold text-rose-700 hover:bg-rose-50">
+                        ⏹ 停止辨識
+                    </button>
+                </div>
+
+                <!-- 關鍵字搜尋列 -->
+                <div>
+                    <input type="text" id="wardrobe-search-input" oninput="handleWardrobeSearch(this.value)" placeholder="🔍 搜尋單品名稱、顏色或背面特徵（例如：白褲、球衣、背號、淺灰）..." class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2 text-xs text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition">
+                </div>
+            </div>
+
+            <!-- 清空全部確認橫幅 -->
+            <div id="clear-all-confirm-bar" class="hidden p-4 rounded-2xl bg-rose-50 border border-rose-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="text-xs sm:text-sm font-bold text-rose-900">確定要清空全部衣櫥單品與圖庫嗎？建議先使用右上角「💾 備份/還原」下載保存。</div>
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="hideEl('clear-all-confirm-bar')" class="px-3 py-1.5 rounded-xl bg-white border border-rose-200 text-xs font-semibold text-zinc-700">取消</button>
+                    <button type="button" onclick="executeClearAllWardrobe()" class="px-3.5 py-1.5 rounded-xl bg-rose-600 text-white text-xs font-bold">確定全部清空</button>
+                </div>
+            </div>
+
+            <!-- 新增單品展開卡片 -->
+            <div id="add-single-card" class="hidden bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-editorialBorder pb-3">
+                    <div>
+                        <h3 class="font-serif text-lg font-bold text-editorialText">新增衣櫥單品（選填式正反面雙照）</h3>
+                        <p class="text-xs text-editorialMuted">正反面合併儲存為同一件單品；穿著次數自建檔後 0 次起算，價格選填可留白</p>
+                    </div>
+                    <button type="button" onclick="toggleAddSingleCard(false)" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold text-editorialMuted">✕</button>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <!-- 左側雙照上傳格 -->
+                    <div class="lg:col-span-5 space-y-2">
+                        <div class="grid grid-cols-2 gap-3">
+                            <!-- 正面照 (必選) -->
+                            <div class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-editorialText">正面照 <span class="text-rose-600">*</span></span>
+                                    <button type="button" id="btn-rm-front" onclick="clearNewPhoto('front')" class="hidden text-[10px] text-rose-600 hover:underline">清除</button>
+                                </div>
+                                <input type="file" id="new-front-file" accept="image/*" class="hidden" onchange="handleNewDualFile(event, 'front')">
+                                <div onclick="getEl('new-front-file').click()" class="h-40 rounded-2xl border-2 border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex flex-col items-center justify-center p-2 text-center cursor-pointer overflow-hidden relative transition">
+                                    <img id="new-front-preview" src="" alt="正面預覽" class="hidden w-full h-full object-cover rounded-xl">
+                                    <div id="new-front-placeholder" class="space-y-1">
+                                        <span class="text-xl">📷</span>
+                                        <p class="text-xs font-bold text-editorialText">點擊上傳正面</p>
+                                        <p class="text-[10px] text-editorialMuted">WebP 高清壓縮</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 背面照 (選填) -->
+                            <div id="new-back-upload-col" class="space-y-1">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-editorialMuted">背面照（選填）</span>
+                                    <button type="button" id="btn-rm-back" onclick="clearNewPhoto('back')" class="hidden text-[10px] text-rose-600 hover:underline">清除</button>
+                                </div>
+                                <input type="file" id="new-back-file" accept="image/*" class="hidden" onchange="handleNewDualFile(event, 'back')">
+                                <div onclick="getEl('new-back-file').click()" class="h-40 rounded-2xl border-2 border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex flex-col items-center justify-center p-2 text-center cursor-pointer overflow-hidden relative transition">
+                                    <img id="new-back-preview" src="" alt="背面預覽" class="hidden w-full h-full object-cover rounded-xl">
+                                    <div id="new-back-placeholder" class="space-y-1">
+                                        <span class="text-xl">🔄</span>
+                                        <p class="text-xs font-bold text-editorialText">補拍背面設計</p>
+                                        <p class="text-[10px] text-editorialMuted">背號/印花/帽後扣</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="single-side-hint-bar" class="hidden p-2.5 rounded-xl bg-editorialSand/70 border border-editorialBorder flex items-center justify-between text-[11px] text-editorialText">
+                            <span>貼身內著或襪類可僅拍正面快速建檔</span>
+                            <button type="button" onclick="showEl('new-back-upload-col'); hideEl('single-side-hint-bar')" class="font-bold text-editorialAccent underline">展開背面框</button>
+                        </div>
+
+                        <button type="button" id="btn-ai-detect-single" onclick="aiDetectNewSingleItem()" class="w-full py-2.5 px-3 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText transition">
+                            ✨ AI 雙面自動辨識名稱與洗護建議
+                        </button>
+                    </div>
+
+                    <!-- 右側欄位表單 -->
+                    <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label for="new-item-cat" class="block text-xs font-bold text-editorialText mb-1">單品分類</label>
+                            <select id="new-item-cat" onchange="onNewItemCategoryChange(this.value)" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                                <option value="top">上衣（球衣 / T恤 / 襯衫 / 衛衣）</option>
+                                <option value="outerwear">外套（毛外套 / 連帽 / 夾克）</option>
+                                <option value="bottom">下身（牛仔褲 / 寬褲 / 短褲）</option>
+                                <option value="underwear">內褲（貼身內著 / 防透色選擇）</option>
+                                <option value="socks">襪子（長襪 / 中筒襪 / 隱形襪）</option>
+                                <option value="shoes">鞋子（球鞋 / 德訓 / 靴款）</option>
+                                <option value="accessory">配件（帽子 / 包款 / 皮帶）</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="new-item-color" class="block text-xs font-bold text-editorialText mb-1">主色系</label>
+                            <input type="text" id="new-item-color" placeholder="例如：純白色、深海軍藍、淺灰" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="new-item-name" class="block text-xs font-bold text-editorialText mb-1">單品名稱 <span class="text-rose-600">*</span></label>
+                            <input type="text" id="new-item-name" placeholder="例如：白色直筒牛仔褲、邁阿密國際粉紅球衣" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div>
+                            <label for="new-item-price" class="block text-xs font-bold text-editorialText mb-1">購入價格（選填，可留白）</label>
+                            <input type="number" id="new-item-price" min="0" placeholder="不知道價格可直接留白" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div>
+                            <label for="new-item-threshold" class="block text-xs font-bold text-editorialText mb-1">洗護提醒門檻（穿幾次提醒）</label>
+                            <input type="number" id="new-item-threshold" min="1" value="2" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="new-item-care" class="block text-xs font-bold text-editorialText mb-1">洗護與防雷標籤</label>
+                            <input type="text" id="new-item-care" value="手洗 · 禁烘乾 · 禁直接噴香水" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label for="new-item-notes" class="block text-xs font-bold text-editorialText mb-1">背面特徵或穿搭備註（選填）</label>
+                            <input type="text" id="new-item-notes" placeholder="例如：背面印有 10 號背號、微蓋鞋舌版型" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        </div>
+
+                        <div class="sm:col-span-2 flex justify-end gap-2 pt-2">
+                            <button type="button" onclick="toggleAddSingleCard(false)" class="px-4 py-2.5 rounded-xl bg-editorialBg border border-editorialBorder text-xs font-semibold text-editorialText">取消</button>
+                            <button type="button" onclick="saveNewWardrobeItem()" class="px-5 py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold shadow-sm transition">
+                                ✓ 存入 UltraDB 大容量衣櫥
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 衣櫥單品網格區 -->
+            <div id="wardrobe-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- 分頁 3：🎨 造型工坊 & 週曆 -->
+        <!-- ===================================================================== -->
+        <section id="tab-studio" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- 左欄：7 槽位自由拼貼台 -->
+            <div class="lg:col-span-7 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
+                <div class="flex flex-wrap items-start justify-between gap-2">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">7-SLOT OUTFIT BUILDER</span>
+                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">7 槽位自由造型拼貼台</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">包含貼身內褲槽位，搭配白褲時自動啟動防透色檢查</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="clearStudioSlots()" class="px-3 py-1.5 rounded-xl bg-editorialBg hover:bg-editorialSand border border-editorialBorder text-xs font-semibold text-editorialText">清空畫布</button>
+                        <button type="button" onclick="aiAutoFillStudio()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText">✨ AI 從衣櫥抓一套</button>
+                    </div>
+                </div>
+
+                <!-- 白褲 + 深色內褲防透色自動警告橫幅 -->
+                <div id="underwear-transparency-alert" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex items-start gap-2.5">
+                    <span class="text-base">⚠️</span>
+                    <div>
+                        <div class="font-bold">白褲／淺色下身防透色提醒</div>
+                        <p id="underwear-alert-msg" class="mt-0.5 leading-relaxed">偵測到您選了白色或淺色下身搭配深色內褲，強光下容易透出顏色邊界，建議改選淺灰、膚色或純白內褲！</p>
+                    </div>
+                </div>
+
+                <!-- 7 個造型槽位網格 -->
+                <div id="studio-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+
+                <!-- 槽位操作按鈕 -->
+                <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-editorialBorder">
+                    <button type="button" onclick="saveCurrentStudioOutfit()" class="px-4 py-2.5 rounded-xl bg-editorialBg hover:bg-editorialSand border border-editorialBorder text-xs font-bold text-editorialText transition">
+                        💾 儲存至造型庫（供週曆排程）
+                    </button>
+                    <button type="button" onclick="checkInCurrentOutfitToday()" class="px-5 py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs sm:text-sm font-bold shadow-sm transition">
+                        ✅ 今日就穿這套打卡（整套穿著 +1）
+                    </button>
+                </div>
+
+                <!-- 已儲存造型庫 -->
+                <div class="space-y-2.5 pt-2 border-t border-editorialBorder">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-editorialText">已儲存造型配方庫</h3>
+                        <span id="saved-outfits-count" class="text-[11px] text-editorialMuted">0 套</span>
+                    </div>
+                    <div id="saved-outfits-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5"></div>
+                </div>
+            </div>
+
+            <!-- 右欄：📅 一週 OOTD 排程日曆 & 歷史穿搭足跡 -->
+            <div class="lg:col-span-5 space-y-6">
+                <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
+                    <div class="flex items-center justify-between gap-2">
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">WEEKLY OOTD PLANNER</span>
+                            <h2 class="font-serif text-lg font-bold text-editorialText">📅 一週穿搭排程日曆</h2>
+                        </div>
+                        <button type="button" onclick="aiFillNonDuplicateWeek()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText">
+                            ✨ 一鍵排滿不重複
+                        </button>
+                    </div>
+
+                    <div id="weekly-duplicate-warning" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-medium"></div>
+
+                    <div id="weekly-plan-list" class="space-y-2"></div>
+                </div>
+
+                <!-- 歷史真實穿搭打卡足跡 -->
+                <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="font-serif text-base font-bold text-editorialText">👟 每日真實穿搭打卡足跡</h3>
+                        <span id="history-log-count" class="text-[11px] text-editorialMuted">0 筆紀錄</span>
+                    </div>
+                    <div id="ootd-history-list" class="space-y-2 max-h-60 overflow-y-auto"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===================================================================== -->
+        <!-- 分頁 4：🔍 實拍診斷 · 滅火 · 打包 -->
+        <!-- ===================================================================== -->
+        <section id="tab-lab" class="tab-panel hidden grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+            <!-- 左欄：實穿上身照 / 平拍單品組合照深度診斷 -->
+            <div class="lg:col-span-6 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
+                <div>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">RUNWAY &amp; BLOGGER ANALYSIS</span>
+                    <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🔍 實拍 / 平拍雙模式穿搭診斷</h2>
+                    <p class="text-xs text-editorialMuted mt-0.5">支援全身實穿照，或將上衣、褲子、襪子、球鞋平鋪床上的組合照</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-editorialBg border border-editorialBorder">
+                    <button type="button" id="btn-diag-mode-worn" onclick="setDiagPhotoMode('worn')" class="py-2 rounded-lg text-xs font-bold bg-editorialText text-white transition">🧍 實穿上身照</button>
+                    <button type="button" id="btn-diag-mode-flat" onclick="setDiagPhotoMode('flat')" class="py-2 rounded-lg text-xs font-medium text-editorialText hover:bg-editorialSand transition">👕 平拍單品組合照</button>
+                </div>
+
+                <input type="file" id="diag-photo-input" accept="image/*" class="hidden" onchange="handleDiagPhotoUpload(event)">
+                <div onclick="getEl('diag-photo-input').click()" class="h-56 rounded-2xl border-2 border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex flex-col items-center justify-center p-4 text-center cursor-pointer overflow-hidden relative transition">
+                    <img id="diag-photo-preview" src="" alt="診斷照片預覽" class="hidden max-h-full max-w-full object-contain rounded-xl">
+                    <div id="diag-photo-placeholder" class="space-y-1.5">
+                        <span class="text-2xl">📸</span>
+                        <p class="text-xs font-bold text-editorialText">點擊上傳穿搭照或平拍單品組合照</p>
+                        <p class="text-[11px] text-editorialMuted">結合四大時裝週剪裁比例與全球穿搭博主經驗分析</p>
+                    </div>
+                </div>
+
+                <input type="text" id="diag-context-input" placeholder="補充說明（例如：打算去約會，外罩黑色毛外套，這樣比例好嗎？）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-xs text-editorialText">
+
+                <button type="button" id="btn-run-diag" onclick="runPhotoDiagnosis()" class="w-full py-3 rounded-xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-xs sm:text-sm transition">
+                    ✨ 開始深度造型診斷與比例推演
+                </button>
+
+                <div id="diag-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2.5 text-xs leading-relaxed"></div>
+            </div>
+
+            <!-- 右欄：Buy or Bye 購物冷靜期滅火器 + 旅行膠囊打包助手 -->
+            <div class="lg:col-span-6 space-y-6">
+
+                <!-- 🛒 購物前冷靜期診斷 -->
+                <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">ANTI-IMPULSE BUYING</span>
+                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🛒 購物前冷靜期診斷（Buy or Bye 滅火器）</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">上傳網拍或實體店猶豫商品截圖，比對你現有衣櫥能配出幾套</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+                        <div class="sm:col-span-4">
+                            <input type="file" id="bob-photo-input" accept="image/*" class="hidden" onchange="handleBobPhotoUpload(event)">
+                            <div onclick="getEl('bob-photo-input').click()" class="h-28 rounded-2xl border-2 border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex flex-col items-center justify-center p-2 text-center cursor-pointer overflow-hidden">
+                                <img id="bob-photo-preview" src="" alt="欲購商品" class="hidden w-full h-full object-cover rounded-xl">
+                                <div id="bob-photo-placeholder" class="space-y-0.5">
+                                    <span class="text-lg">🛍️</span>
+                                    <p class="text-[10px] font-bold text-editorialText">上傳商品圖(選填)</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sm:col-span-8 space-y-2">
+                            <input type="text" id="bob-name-input" placeholder="欲購買單品名稱（例如：水洗灰工裝降落傘褲）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
+                            <input type="number" id="bob-price-input" min="0" placeholder="商品價格 NT$（選填）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
+                            <button type="button" id="btn-run-bob" onclick="runBuyOrByeAnalysis()" class="w-full py-2.5 rounded-xl bg-editorialAccent hover:bg-editorialAccentHover text-white font-bold text-xs transition">
+                                ⚖️ 比對現有衣櫥：該買（BUY）還是滅火（BYE）？
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="bob-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2 text-xs leading-relaxed"></div>
+                </div>
+
+                <!-- 🧳 旅行膠囊打包助手 -->
+                <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
+                    <div>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">CAPSULE TRAVEL PACKING</span>
+                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🧳 旅行膠囊打包助手（Pack My Bag）</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">從現有衣櫥挑選可一衣多穿的精簡清單，自動計算內褲與襪子備品數量</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <input type="text" id="pack-dest-input" placeholder="目的地（如：台北看演唱會）" class="sm:col-span-2 rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
+                        <input type="number" id="pack-days-input" min="1" max="30" value="3" placeholder="天數" class="rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs font-bold">
+                    </div>
+
+                    <button type="button" id="btn-run-pack" onclick="generateCapsulePackingList()" class="w-full py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-xs transition">
+                        🎒 生成一衣多穿膠囊打包清單
+                    </button>
+
+                    <div id="pack-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2 text-xs leading-relaxed"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ===================================================================== -->
+    <!-- 彈窗 1：多圖批次一鍵匯入彈窗（含 AI 排隊辨識） -->
+    <!-- ===================================================================== -->
+    <div id="batch-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
+                <div>
+                    <h3 class="font-serif text-lg font-bold text-editorialText">📦 多圖批次一鍵匯入（排隊 AI 自動辨識）</h3>
+                    <p class="text-xs text-editorialMuted">一次選取 10～50 張照片時，系統會以排隊機制逐件穩定呼叫 AI 偵測品項</p>
+                </div>
+                <button type="button" onclick="closeModal('batch-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+                <input type="file" id="batch-files-input" accept="image/*" multiple class="hidden" onchange="handleBatchFilesSelected(event)">
+                <div onclick="getEl('batch-files-input').click()" class="p-6 rounded-2xl border-2 border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg text-center cursor-pointer transition">
+                    <div class="text-2xl mb-1">📥</div>
+                    <p class="text-xs font-bold text-editorialText">點擊一次選取多張衣物照片（支援 40～50 張以上排隊辨識）</p>
+                    <p class="text-[11px] text-editorialMuted mt-1">WebP 二進位獨立儲存 · 每張僅約 30KB · 價格選填可留白</p>
+                </div>
+
+                <div id="batch-progress-box" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 space-y-1.5">
+                    <div id="batch-progress-text" class="text-xs font-bold text-amber-950 text-center"></div>
+                    <div class="w-full h-2 rounded-full bg-amber-200/70 overflow-hidden">
+                        <div id="batch-progress-bar" class="h-full bg-editorialAccent transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div id="batch-list-container" class="space-y-2.5"></div>
+            </div>
+
+            <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
+                <button type="button" onclick="closeModal('batch-modal')" class="px-4 py-2 rounded-xl bg-editorialCard border border-editorialBorder text-xs font-semibold">取消</button>
+                <button type="button" id="btn-commit-batch" disabled onclick="commitBatchDrafts()" class="px-5 py-2 rounded-xl bg-editorialText disabled:opacity-40 text-white text-xs font-bold">
+                    ✓ 全部收入 UltraDB 衣櫥
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 彈窗 2：編輯已建檔單品彈窗 -->
+    <!-- ===================================================================== -->
+    <div id="edit-item-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-lg w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
+                <h3 class="font-serif text-lg font-bold text-editorialText">編輯單品資訊與正反面雙照</h3>
+                <button type="button" onclick="closeModal('edit-item-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
+            </div>
+
+            <div class="p-4 sm:p-5 space-y-3 overflow-y-auto">
+                <input type="hidden" id="edit-item-id">
+
+                <div class="grid grid-cols-2 gap-3 pb-1">
+                    <div class="space-y-1">
+                        <span class="block text-[11px] font-bold text-editorialText">正面照（點擊更換）</span>
+                        <input type="file" id="edit-front-file" accept="image/*" class="hidden" onchange="handleEditDualFile(event, 'front')">
+                        <div onclick="getEl('edit-front-file').click()" class="h-28 rounded-xl border border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex items-center justify-center overflow-hidden cursor-pointer">
+                            <img id="edit-front-preview" src="" alt="正面照" class="hidden w-full h-full object-cover">
+                            <span id="edit-front-placeholder" class="text-[11px] text-editorialMuted">點擊上傳正面</span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-editorialMuted">背面照（選填）</span>
+                            <button type="button" id="btn-edit-rm-back" onclick="clearEditBackPhoto()" class="hidden text-[10px] text-rose-600 hover:underline">移除背面</button>
+                        </div>
+                        <input type="file" id="edit-back-file" accept="image/*" class="hidden" onchange="handleEditDualFile(event, 'back')">
+                        <div onclick="getEl('edit-back-file').click()" class="h-28 rounded-xl border border-dashed border-editorialBorder hover:border-editorialText bg-editorialBg flex items-center justify-center overflow-hidden cursor-pointer">
+                            <img id="edit-back-preview" src="" alt="背面照" class="hidden w-full h-full object-cover">
+                            <span id="edit-back-placeholder" class="text-[11px] text-editorialMuted">點擊補傳/更換背面</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="edit-item-cat" class="block text-xs font-bold text-editorialText mb-1">分類</label>
+                        <select id="edit-item-cat" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                            <option value="top">上衣</option>
+                            <option value="outerwear">外套</option>
+                            <option value="bottom">下身</option>
+                            <option value="underwear">內褲</option>
+                            <option value="socks">襪子</option>
+                            <option value="shoes">鞋子</option>
+                            <option value="accessory">配件</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="edit-item-color" class="block text-xs font-bold text-editorialText mb-1">主色系</label>
+                        <input type="text" id="edit-item-color" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="edit-item-name" class="block text-xs font-bold text-editorialText mb-1">單品名稱</label>
+                    <input type="text" id="edit-item-name" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="edit-item-price" class="block text-xs font-bold text-editorialText mb-1">價格（選填留白）</label>
+                        <input type="number" id="edit-item-price" min="0" placeholder="未標價" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="edit-item-threshold" class="block text-xs font-bold text-editorialText mb-1">洗護提醒門檻</label>
+                        <input type="number" id="edit-item-threshold" min="1" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label for="edit-item-care" class="block text-xs font-bold text-editorialText mb-1">洗護標籤</label>
+                    <input type="text" id="edit-item-care" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                </div>
+
+                <div>
+                    <label for="edit-item-notes" class="block text-xs font-bold text-editorialText mb-1">背面特徵或備註</label>
+                    <input type="text" id="edit-item-notes" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
+                <button type="button" onclick="closeModal('edit-item-modal')" class="px-4 py-2 rounded-xl bg-editorialCard border border-editorialBorder text-xs font-semibold">取消</button>
+                <button type="button" onclick="saveEditedWardrobeItem()" class="px-5 py-2 rounded-xl bg-editorialText text-white text-xs font-bold">儲存變更</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 彈窗 3：個人身形檔案設定 -->
+    <!-- ===================================================================== -->
+    <div id="profile-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-md w-full shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
+                <h3 class="font-serif text-lg font-bold text-editorialText">👤 個人身形與風格基因檔案</h3>
+                <button type="button" onclick="closeModal('profile-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-3">
+                <div class="grid grid-cols-3 gap-2.5">
+                    <div>
+                        <label for="prof-h" class="block text-xs font-bold text-editorialText mb-1">身高 (cm)</label>
+                        <input type="number" id="prof-h" value="169" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="prof-kg" class="block text-xs font-bold text-editorialText mb-1">體重 (kg)</label>
+                        <input type="number" id="prof-kg" value="50" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="prof-w" class="block text-xs font-bold text-editorialText mb-1">常穿尺碼</label>
+                        <input type="text" id="prof-w" value="S/M 碼" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="prof-build" class="block text-xs font-bold text-editorialText mb-1">身形輪廓</label>
+                        <input type="text" id="prof-build" value="標準勻稱" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                    <div>
+                        <label for="prof-skin" class="block text-xs font-bold text-editorialText mb-1">膚色調性</label>
+                        <input type="text" id="prof-skin" value="自然暖黃調" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    </div>
+                </div>
+                <div>
+                    <label for="prof-fit" class="block text-xs font-bold text-editorialText mb-1">褲長與比例偏好</label>
+                    <input type="text" id="prof-fit" value="褲長蓋鞋舌" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label for="prof-style" class="block text-xs font-bold text-editorialText mb-1">核心偏好風格</label>
+                    <input type="text" id="prof-style" value="Blokecore, City Boy, 美式街頭, Ivy 微正裝" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                </div>
+            </div>
+            <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
+                <button type="button" onclick="closeModal('profile-modal')" class="px-4 py-2 rounded-xl bg-editorialCard border border-editorialBorder text-xs font-semibold">取消</button>
+                <button type="button" onclick="saveProfileData()" class="px-5 py-2 rounded-xl bg-editorialText text-white text-xs font-bold">儲存個人檔案</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 彈窗 4：備份匯出與還原 (.json) -->
+    <!-- ===================================================================== -->
+    <div id="backup-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-md w-full shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
+                <h3 class="font-serif text-lg font-bold text-editorialText">💾 私人衣櫥備份與無損還原</h3>
+                <button type="button" onclick="closeModal('backup-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-4">
+                <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2">
+                    <div class="text-xs font-bold text-editorialText">1. 匯出完整 .json 備份檔</div>
+                    <p class="text-[11px] text-editorialMuted leading-relaxed">將 UltraDB 二進位圖庫中的所有正面照、背面照、造型庫與週曆打包成單一備份檔保存到手機或電腦。</p>
+                    <button type="button" id="btn-export-json" onclick="exportFullBackupJson()" class="w-full py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold transition">
+                        ⬇️ 下載完整備份檔 (.json)
+                    </button>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2">
+                    <div class="text-xs font-bold text-editorialText">2. 從備份檔還原至 UltraDB</div>
+                    <p class="text-[11px] text-editorialMuted leading-relaxed">選取先前匯出的 `.json` 檔案，系統會自動將照片轉回高速二進位 Blob 存入資料庫。</p>
+                    <button type="button" onclick="triggerImportBackupJson()" class="w-full py-2.5 rounded-xl bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-editorialText text-xs font-bold transition">
+                        ⬆️ 選取備份檔並還原
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- 彈窗 5：Gemini API 金鑰設定 -->
+    <!-- ===================================================================== -->
+    <div id="apikey-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+        <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-md w-full shadow-2xl overflow-hidden">
+            <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
+                <h3 class="font-serif text-lg font-bold text-editorialText">🔑 Gemini AI 金鑰設定</h3>
+                <button type="button" onclick="closeModal('apikey-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-5 space-y-3">
+                <p class="text-xs text-editorialMuted leading-relaxed">
+                    填入 Google AI Studio 申請的 Gemini API Key（目前使用穩定版 <code>gemini-2.5-flash</code> 模型），即可啟用雲端視覺自動辨識衣服品項、顏色與穿搭診斷。
+                </p>
+                <input type="password" id="apikey-input" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-sm">
+            </div>
+            <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
+                <button type="button" onclick="clearCustomApiKey()" class="px-3.5 py-2 rounded-xl bg-editorialCard border border-editorialBorder text-xs font-semibold text-rose-600">清除金鑰</button>
+                <button type="button" onclick="saveCustomApiKey()" class="px-5 py-2 rounded-xl bg-editorialText text-white text-xs font-bold">儲存設定</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =====================================================================
+        // 1. 全域輔助函式與錯誤邊界防護
+        // =====================================================================
+        function getEl(id) { return document.getElementById(id); }
+        function showEl(id) { const el = getEl(id); if (el) el.classList.remove('hidden'); }
+        function hideEl(id) { const el = getEl(id); if (el) el.classList.add('hidden'); }
+        function setText(id, txt) { const el = getEl(id); if (el) el.textContent = txt; }
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        let toastTimer = null;
+        function showToast(msg, type = 'info') {
+            const box = getEl('global-toast');
+            const icon = getEl('global-toast-icon');
+            const text = getEl('global-toast-msg');
+            if (!box || !text) return;
+            text.textContent = msg;
+            if (icon) icon.textContent = type === 'error' ? '⚠️' : '✨';
+            box.className = type === 'error'
+                ? 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium flex items-center gap-2.5 bg-rose-900 text-white border-rose-700'
+                : 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium flex items-center gap-2.5 bg-editorialText text-white border-zinc-700';
+            box.classList.remove('hidden');
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => box.classList.add('hidden'), 3800);
+        }
+
+        window.onerror = function (msg) {
+            console.warn('Caught runtime notice:', msg);
+            return true;
+        };
+        window.onunhandledrejection = function (ev) {
+            console.warn('Caught async notice:', ev.reason);
+        };
+
+        // =====================================================================
+        // 2. Ultra-Capacity IndexedDB 二進位 Blob 獨立圖庫引擎 (StyleFit_UltraDB_v2)
+        // =====================================================================
+        const ULTRA_DB_NAME = 'StyleFit_UltraDB_v2';
+        const ULTRA_DB_VERSION = 1;
+        const STORE_META = 'meta_store';
+        const STORE_BLOBS = 'image_blobs';
+        const APIKEY_LS_KEY = 'stylefit_ultrav2_apikey';
+        const GEMINI_MODEL = 'gemini-2.5-flash';
+
+        let ultraDb = null;
+        let isMemoryFallbackMode = false;
+        const memoryBlobStore = new Map();
+        const objectUrlCache = new Map();
+
+        function createDefaultMeta() {
+            return {
+                wardrobe: [],
+                outfits: [],
+                weeklyPlan: {},
+                wearLogs: [],
+                profile: {
+                    height: 169,
+                    kg: 50,
+                    weight: 'S/M 碼',
+                    build: '標準勻稱',
+                    skin: '自然暖黃調',
+                    fit: '褲長蓋鞋舌',
+                    style: 'Blokecore, City Boy, 美式街頭, Ivy 微正裝'
+                }
+            };
+        }
+
+        let appState = createDefaultMeta();
+
+        function openUltraDB() {
+            return new Promise((resolve, reject) => {
+                if (ultraDb) return resolve(ultraDb);
+                if (!window.indexedDB) return reject(new Error('IndexedDB unavailable'));
+                try {
+                    const req = indexedDB.open(ULTRA_DB_NAME, ULTRA_DB_VERSION);
+                    req.onupgradeneeded = ev => {
+                        const db = ev.target.result;
+                        if (!db.objectStoreNames.contains(STORE_META)) {
+                            db.createObjectStore(STORE_META, { keyPath: 'key' });
+                        }
+                        if (!db.objectStoreNames.contains(STORE_BLOBS)) {
+                            db.createObjectStore(STORE_BLOBS);
+                        }
+                    };
+                    req.onsuccess = ev => {
+                        ultraDb = ev.target.result;
+                        resolve(ultraDb);
+                    };
+                    req.onerror = () => reject(req.error || new Error('Open UltraDB failed'));
+                } catch (err) {
+                    reject(err);
+                }
+            });
+        }
+
+        async function putImageBlob(blobKey, blob) {
+            if (!blobKey || !blob) return;
+            memoryBlobStore.set(blobKey, blob);
+            if (objectUrlCache.has(blobKey)) {
+                try { URL.revokeObjectURL(objectUrlCache.get(blobKey)); } catch (e) {}
+            }
+            objectUrlCache.set(blobKey, URL.createObjectURL(blob));
+
+            if (isMemoryFallbackMode) return;
+            try {
+                const db = await openUltraDB();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_BLOBS, 'readwrite');
+                    tx.objectStore(STORE_BLOBS).put(blob, blobKey);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+            } catch (e) {
+                enableMemoryFallback();
+            }
+        }
+
+        async function deleteImageBlob(blobKey) {
+            if (!blobKey) return;
+            memoryBlobStore.delete(blobKey);
+            if (objectUrlCache.has(blobKey)) {
+                try { URL.revokeObjectURL(objectUrlCache.get(blobKey)); } catch (e) {}
+                objectUrlCache.delete(blobKey);
+            }
+            if (isMemoryFallbackMode) return;
+            try {
+                const db = await openUltraDB();
+                await new Promise((resolve) => {
+                    const tx = db.transaction(STORE_BLOBS, 'readwrite');
+                    tx.objectStore(STORE_BLOBS).delete(blobKey);
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => resolve(false);
+                });
+            } catch (e) {}
+        }
+
+        async function getImageBlob(blobKey) {
+            if (!blobKey) return null;
+            if (memoryBlobStore.has(blobKey)) return memoryBlobStore.get(blobKey);
+            if (isMemoryFallbackMode) return null;
+            try {
+                const db = await openUltraDB();
+                const blob = await new Promise((resolve) => {
+                    const tx = db.transaction(STORE_BLOBS, 'readonly');
+                    const req = tx.objectStore(STORE_BLOBS).get(blobKey);
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                });
+                if (blob) {
+                    memoryBlobStore.set(blobKey, blob);
+                    if (!objectUrlCache.has(blobKey)) {
+                        objectUrlCache.set(blobKey, URL.createObjectURL(blob));
+                    }
+                }
+                return blob;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function getDisplayImageUrl(blobKey) {
+            if (!blobKey) return '';
+            if (objectUrlCache.has(blobKey)) return objectUrlCache.get(blobKey);
+            if (memoryBlobStore.has(blobKey)) {
+                const url = URL.createObjectURL(memoryBlobStore.get(blobKey));
+                objectUrlCache.set(blobKey, url);
+                return url;
+            }
+            return '';
+        }
+
+        function enableMemoryFallback() {
+            if (isMemoryFallbackMode) return;
+            isMemoryFallbackMode = true;
+            const badge = getEl('header-storage-badge');
+            if (badge) {
+                badge.className = 'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 text-amber-800 border border-amber-200';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span>安全記憶體模式（請記得匯出備份）</span>';
+            }
+        }
+
+        async function saveMetaState() {
+            if (isMemoryFallbackMode) return true;
+            try {
+                const db = await openUltraDB();
+                await new Promise((resolve, reject) => {
+                    const tx = db.transaction(STORE_META, 'readwrite');
+                    tx.objectStore(STORE_META).put({
+                        key: 'ultra_meta_v2',
+                        value: appState
+                    });
+                    tx.oncomplete = () => resolve(true);
+                    tx.onerror = () => reject(tx.error);
+                });
+                updateStorageStatsUI();
+                return true;
+            } catch (e) {
+                enableMemoryFallback();
+                return true;
+            }
+        }
+
+        async function loadAllFromUltraDB() {
+            try {
+                if (navigator.storage && navigator.storage.persist) {
+                    navigator.storage.persist().catch(() => {});
+                }
+                const db = await openUltraDB();
+                const metaRec = await new Promise((resolve) => {
+                    const tx = db.transaction(STORE_META, 'readonly');
+                    const req = tx.objectStore(STORE_META).get('ultra_meta_v2');
+                    req.onsuccess = () => resolve(req.result || null);
+                    req.onerror = () => resolve(null);
+                });
+
+                if (metaRec && metaRec.value) {
+                    const base = createDefaultMeta();
+                    appState = {
+                        wardrobe: Array.isArray(metaRec.value.wardrobe) ? metaRec.value.wardrobe : [],
+                        outfits: Array.isArray(metaRec.value.outfits) ? metaRec.value.outfits : [],
+                        weeklyPlan: metaRec.value.weeklyPlan || {},
+                        wearLogs: Array.isArray(metaRec.value.wearLogs) ? metaRec.value.wearLogs : [],
+                        profile: metaRec.value.profile ? { ...base.profile, ...metaRec.value.profile } : base.profile
+                    };
+                }
+
+                for (const item of appState.wardrobe) {
+                    if (item.hasFront) await getImageBlob(`front_${item.id}`);
+                    if (item.hasBack) await getImageBlob(`back_${item.id}`);
+                }
+            } catch (e) {
+                enableMemoryFallback();
+            }
+        }
+
+        function dataUrlToBlob(dataUrl) {
+            if (!dataUrl || !dataUrl.startsWith('data:')) return null;
+            try {
+                const parts = dataUrl.split(',');
+                const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+                const bstr = atob(parts[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) u8arr[n] = bstr.charCodeAt(n);
+                return new Blob([u8arr], { type: mime });
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function blobToDataUrl(blob) {
+            return new Promise((resolve) => {
+                if (!blob) return resolve('');
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result || '');
+                reader.onerror = () => resolve('');
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function migrateLegacyStoresIfNeeded() {
+            let migratedCount = 0;
+            if (!isMemoryFallbackMode && window.indexedDB) {
+                try {
+                    const legacyDb = await new Promise((resolve) => {
+                        const req = indexedDB.open('StyleFit_Wardrobe_IndexedDB_v1', 1);
+                        req.onsuccess = ev => resolve(ev.target.result);
+                        req.onerror = () => resolve(null);
+                    });
+                    if (legacyDb && legacyDb.objectStoreNames.contains('wardrobe_items')) {
+                        const oldItems = await new Promise((resolve) => {
+                            const tx = legacyDb.transaction('wardrobe_items', 'readonly');
+                            const req = tx.objectStore('wardrobe_items').getAll();
+                            req.onsuccess = () => resolve(req.result || []);
+                            req.onerror = () => resolve([]);
+                        });
+                        const existingIds = new Set(appState.wardrobe.map(i => i.id));
+                        for (const old of oldItems) {
+                            if (!old || !old.id || existingIds.has(old.id)) continue;
+                            const fBlob = dataUrlToBlob(old.frontImage);
+                            const bBlob = dataUrlToBlob(old.backImage);
+                            if (fBlob) await putImageBlob(`front_${old.id}`, fBlob);
+                            if (bBlob) await putImageBlob(`back_${old.id}`, bBlob);
+                            appState.wardrobe.push({
+                                id: old.id,
+                                category: old.category || 'top',
+                                name: old.name || '未命名單品',
+                                color: old.color || '經典色',
+                                price: (typeof old.price === 'number' && old.price > 0) ? old.price : null,
+                                washThreshold: old.washThreshold || 2,
+                                care: old.care || '裝洗衣袋柔洗 · 禁高溫烘乾',
+                                notes: old.notes || '',
+                                hasFront: Boolean(fBlob),
+                                hasBack: Boolean(bBlob),
+                                wearCount: old.wearCount || 0,
+                                wearsSinceWash: old.wearsSinceWash || 0,
+                                createdAt: old.createdAt || new Date().toISOString()
+                            });
+                            existingIds.add(old.id);
+                            migratedCount++;
+                        }
+                        legacyDb.close();
+                        try { indexedDB.deleteDatabase('StyleFit_Wardrobe_IndexedDB_v1'); } catch (e) {}
+                    }
+                } catch (e) {}
+            }
+
+            if (migratedCount > 0) {
+                await saveMetaState();
+                showToast(`🚀 已將 ${migratedCount} 件舊版單品無損轉換為 UltraDB 二進位圖庫！`);
+            }
+        }
+
+        async function updateStorageStatsUI() {
+            const capEl = getEl('kpi-capacity');
+            const subEl = getEl('kpi-capacity-sub');
+            if (!capEl) return;
+
+            let blobBytes = 0;
+            memoryBlobStore.forEach(b => { blobBytes += (b?.size || 0); });
+            const usedMB = (blobBytes / (1024 * 1024)).toFixed(2);
+
+            try {
+                if (!isMemoryFallbackMode && navigator.storage && navigator.storage.estimate) {
+                    const est = await navigator.storage.estimate();
+                    const quotaMB = est.quota ? Math.round(est.quota / (1024 * 1024)) : 2048;
+                    const quotaLabel = quotaMB >= 1024 ? `${(quotaMB / 1024).toFixed(1)} GB` : `${quotaMB} MB`;
+                    capEl.textContent = `已用 ${usedMB} MB`;
+                    if (subEl) subEl.textContent = `可用空間 ${quotaLabel} · 可存 1,000+ 件雙照`;
+                    return;
+                }
+            } catch (e) {}
+
+            capEl.textContent = `已用 ${usedMB} MB`;
+            if (subEl) subEl.textContent = isMemoryFallbackMode ? '安全記憶體模式 · 建議定期下載備份' : 'UltraDB 二進位圖庫 · 可存 1,000+ 件';
+        }
+
+        // =====================================================================
+        // 3. WebP / JPEG 智慧二進位壓縮引擎
+        // =====================================================================
+        function compressImageToBlob(file, maxDim = 640, quality = 0.78) {
+            return new Promise((resolve, reject) => {
+                if (!file || !file.type || !file.type.startsWith('image/')) {
+                    return reject(new Error('非圖片格式'));
+                }
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('讀取圖片失敗'));
+                reader.onload = ev => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('圖片解碼失敗'));
+                    img.onload = () => {
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+
+                        canvas.toBlob(webpBlob => {
+                            if (webpBlob && webpBlob.size > 0) {
+                                resolve(webpBlob);
+                            } else {
+                                canvas.toBlob(jpgBlob => {
+                                    if (jpgBlob) resolve(jpgBlob);
+                                    else reject(new Error('Canvas 轉換 Blob 失敗'));
+                                }, 'image/jpeg', quality);
+                            }
+                        }, 'image/webp', quality);
+                    };
+                    img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // =====================================================================
+        // 4. 分類定義、排隊佇列與 Gemini API 呼叫器 (gemini-2.5-flash)
+        // =====================================================================
+        const CATEGORY_META = {
+            top: { label: '上衣', defaultThreshold: 2, defaultCare: '手洗 · 禁烘乾 · 禁直接噴香水' },
+            outerwear: { label: '外套', defaultThreshold: 4, defaultCare: '局部清潔 · 禁直接噴香水' },
+            bottom: { label: '下身', defaultThreshold: 4, defaultCare: '裝洗衣袋柔洗 · 禁高溫烘乾' },
+            underwear: { label: '內褲', defaultThreshold: 1, defaultCare: '手洗或裝洗衣袋柔洗 · 禁高溫烘乾' },
+            socks: { label: '襪子', defaultThreshold: 1, defaultCare: '一般機洗' },
+            shoes: { label: '鞋子', defaultThreshold: 6, defaultCare: '局部擦拭保養' },
+            accessory: { label: '配件', defaultThreshold: 6, defaultCare: '局部擦拭保養' }
+        };
+
+        const STUDIO_SLOTS = ['outerwear', 'top', 'bottom', 'underwear', 'socks', 'shoes', 'accessory'];
+        const WEEK_DAYS = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
+
+        let activeFilterCat = 'all';
+        let activeSearchQuery = '';
+        let cardBackViewMap = {};
+        let supplementTargetId = null;
+
+        let newFrontBlob = null;
+        let newBackBlob = null;
+        let editFrontBlob = null;
+        let editBackBlob = null;
+        let editKeepExistingBack = false;
+
+        let erPhotoDataUrl = '';
+        let diagPhotoMode = 'worn';
+        let diagPhotoDataUrl = '';
+        let bobPhotoDataUrl = '';
+        let batchDrafts = [];
+        let batchAiAbort = false;
+        let wardrobeBulkAiAbort = false;
+        const wardrobeBusyItemIds = new Set();
+
+        let studioSlotIds = {
+            outerwear: null,
+            top: null,
+            bottom: null,
+            underwear: null,
+            socks: null,
+            shoes: null,
+            accessory: null
+        };
+
+        const apiKey = "";
+        function resolveApiKey() {
+            if (apiKey && apiKey.trim()) return apiKey.trim();
+            try { return localStorage.getItem(APIKEY_LS_KEY) || ''; } catch (e) { return ''; }
+        }
+
+        function safeParseJSON(rawText) {
+            if (!rawText) return null;
+            let cleaned = rawText.trim();
+            if (cleaned.startsWith('```')) {
+                cleaned = cleaned.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
+            }
+            try { return JSON.parse(cleaned); } catch (e) {
+                const start = cleaned.indexOf('{');
+                const end = cleaned.lastIndexOf('}');
+                if (start !== -1 && end > start) {
+                    try { return JSON.parse(cleaned.slice(start, end + 1)); } catch (e2) { return null; }
+                }
+                return null;
+            }
+        }
+
+        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 3) {
+            const key = resolveApiKey();
+            if (!key) return null;
+
+            const parts = [{ text: promptText }];
+            for (const b64 of base64Images) {
+                if (!b64 || !b64.includes(',')) continue;
+                const [header, data] = b64.split(',');
+                const mimeMatch = header.match(/data:(.*?);base64/);
+                parts.push({
+                    inlineData: {
+                        mimeType: mimeMatch ? mimeMatch[1] : 'image/jpeg',
+                        data
+                    }
+                });
+            }
+
+            const url = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
+            for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{ parts }],
+                            generationConfig: {
+                                temperature: 0.3,
+                                responseMimeType: 'application/json'
+                            }
+                        })
+                    });
+
+                    if (res.status === 429) {
+                        // 遇到速率限制時加長退避等待時間
+                        const waitMs = 3000 * Math.pow(2, attempt);
+                        await new Promise(r => setTimeout(r, waitMs));
+                        continue;
+                    }
+
+                    if (!res.ok) {
+                        const errBody = await res.json().catch(() => ({}));
+                        const errMsg = errBody?.error?.message || `HTTP ${res.status}`;
+                        throw new Error(errMsg);
+                    }
+
+                    const json = await res.json();
+                    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                    const parsed = safeParseJSON(text);
+                    if (parsed) return parsed;
+                } catch (err) {
+                    if (attempt === maxRetries) {
+                        console.warn('Gemini API error:', err.message);
+                        throw err;
+                    }
+                    await new Promise(r => setTimeout(r, 1200 * Math.pow(2, attempt)));
+                }
+            }
+            return null;
+        }
+
+        // 共用服飾視覺辨識函式（支援正面 + 選填背面）
+        async function detectGarmentDetailsFromBlobs(frontBlob, backBlob = null) {
+            if (!frontBlob) return null;
+            const imgs = [await blobToDataUrl(frontBlob)];
+            if (backBlob) imgs.push(await blobToDataUrl(backBlob));
+
+            const ai = await callGeminiAPI(
+                `你是專業服飾與球衣鑑定專家。請辨識這件服飾的正面${backBlob ? '與背面' : ''}照片（嚴禁猜測價格），並回傳繁體中文 JSON：
+{
+  "category": "top|outerwear|bottom|underwear|socks|shoes|accessory",
+  "name": "精準具體的單品名稱（例如：曼城24/25主場球衣、白色直筒牛仔褲、黑色連帽外套、Nike中筒長襪、Calvin Klein純白四角褲）",
+  "color": "主色系（例如：純白色、海軍藍、水洗灰）",
+  "care": "針對此材質的洗護防雷建議",
+  "notes": "版型、印花或背面特徵簡述（無則留空字串）"
+}`,
+                imgs,
+                3
+            );
+
+            if (ai && CATEGORY_META[ai.category]) {
+                return {
+                    category: ai.category,
+                    name: (ai.name || '').trim(),
+                    color: (ai.color || '').trim() || '經典色',
+                    care: (ai.care || '').trim() || CATEGORY_META[ai.category].defaultCare,
+                    notes: (ai.notes || '').trim()
+                };
+            }
+            return null;
+        }
+
+        // 判斷單品是否為「尚未辨識出細項」（例如檔名是 IMG_1234、單品 5、未命名單品）
+        function isItemNeedsAiDetection(item) {
+            if (!item) return false;
+            if (item.aiDetected === true) return false;
+            const n = (item.name || '').trim();
+            if (!n || n === '未命名單品') return true;
+            if (/^(IMG|DSC|DCIM|PXL|Screenshot|Photo|image|單品|衣物|照片|未命名)[_\-\s0-9()]*$/i.test(n)) return true;
+            if (/^[0-9a-f\-_]{6,}$/i.test(n)) return true;
+            return false;
+        }
+
+        // =====================================================================
+        // 5. 導覽分頁、彈窗與備份還原
+        // =====================================================================
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+            showEl(`tab-${tabName}`);
+            document.querySelectorAll('.main-nav-btn').forEach(btn => {
+                const isTarget = btn.getAttribute('data-tab') === tabName;
+                btn.className = isTarget
+                    ? 'main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-editorialText text-white whitespace-nowrap transition'
+                    : 'main-nav-btn px-3.5 py-2 rounded-xl text-xs sm:text-sm font-medium bg-editorialCard text-editorialText border border-editorialBorder hover:bg-editorialSand whitespace-nowrap transition';
+            });
+            if (tabName === 'wardrobe') renderWardrobeSection();
+            if (tabName === 'studio') {
+                renderStudioSlots();
+                renderSavedOutfits();
+                renderWeeklyPlan();
+                renderOotdHistoryLog();
+            }
+        }
+
+        function openModal(id) {
+            showEl(id);
+            if (id === 'profile-modal') {
+                const p = appState.profile;
+                if (getEl('prof-h')) getEl('prof-h').value = p.height;
+                if (getEl('prof-kg')) getEl('prof-kg').value = p.kg || 50;
+                if (getEl('prof-w')) getEl('prof-w').value = p.weight;
+                if (getEl('prof-build')) getEl('prof-build').value = p.build;
+                if (getEl('prof-skin')) getEl('prof-skin').value = p.skin;
+                if (getEl('prof-fit')) getEl('prof-fit').value = p.fit;
+                if (getEl('prof-style')) getEl('prof-style').value = p.style;
+            }
+            if (id === 'apikey-modal') {
+                if (getEl('apikey-input')) getEl('apikey-input').value = resolveApiKey();
+            }
+        }
+        function closeModal(id) {
+            if (id === 'batch-modal') batchAiAbort = true;
+            hideEl(id);
+        }
+
+        function refreshProfileBadge() {
+            const p = appState.profile;
+            setText('header-profile-pill', `${p.height} cm · ${p.weight} · ${p.fit}`);
+        }
+
+        async function saveProfileData() {
+            appState.profile = {
+                height: Number(getEl('prof-h')?.value) || 169,
+                kg: Number(getEl('prof-kg')?.value) || 50,
+                weight: (getEl('prof-w')?.value || 'S/M 碼').trim(),
+                build: (getEl('prof-build')?.value || '標準勻稱').trim(),
+                skin: (getEl('prof-skin')?.value || '自然暖黃調').trim(),
+                fit: (getEl('prof-fit')?.value || '褲長蓋鞋舌').trim(),
+                style: (getEl('prof-style')?.value || 'Blokecore, City Boy').trim()
+            };
+            await saveMetaState();
+            refreshProfileBadge();
+            closeModal('profile-modal');
+            showToast('已更新個人身形與風格基因檔案！');
+        }
+
+        function saveCustomApiKey() {
+            const val = (getEl('apikey-input')?.value || '').trim();
+            try { localStorage.setItem(APIKEY_LS_KEY, val); } catch (e) {}
+            closeModal('apikey-modal');
+            showToast(val ? 'Gemini API 金鑰已儲存（使用 gemini-2.5-flash）！' : '已清除自訂金鑰。');
+        }
+
+        function clearCustomApiKey() {
+            if (getEl('apikey-input')) getEl('apikey-input').value = '';
+            try { localStorage.removeItem(APIKEY_LS_KEY); } catch (e) {}
+            closeModal('apikey-modal');
+            showToast('已清除自訂 API 金鑰。');
+        }
+
+        async function exportFullBackupJson() {
+            const btn = getEl('btn-export-json');
+            if (btn) { btn.disabled = true; btn.textContent = '正在打包二進位圖庫...'; }
+            try {
+                const itemsWithImages = [];
+                for (const item of appState.wardrobe) {
+                    const fBlob = item.hasFront ? await getImageBlob(`front_${item.id}`) : null;
+                    const bBlob = item.hasBack ? await getImageBlob(`back_${item.id}`) : null;
+                    itemsWithImages.push({
+                        ...item,
+                        frontImage: await blobToDataUrl(fBlob),
+                        backImage: await blobToDataUrl(bBlob)
+                    });
+                }
+                const payload = {
+                    app: 'StyleFit AI',
+                    version: 'UltraDB_v2',
+                    exportedAt: new Date().toISOString(),
+                    data: {
+                        ...appState,
+                        wardrobe: itemsWithImages
+                    }
+                };
+                const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `StyleFit_UltraBackup_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                showToast(`已成功匯出完整備份檔（含 ${itemsWithImages.length} 件雙照單品）！`);
+            } catch (e) {
+                showToast('匯出備份檔失敗，請稍後再試。', 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '⬇️ 下載完整備份檔 (.json)'; }
+            }
+        }
+
+        function triggerImportBackupJson() {
+            const inp = getEl('global-import-json-input');
+            if (inp) { inp.value = ''; inp.click(); }
+        }
+
+        function handleImportBackupFile(event) {
+            const file = event.target?.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async ev => {
+                try {
+                    const parsed = JSON.parse(ev.target.result);
+                    const imported = parsed?.data ? parsed.data : parsed;
+                    if (!imported || !Array.isArray(imported.wardrobe)) {
+                        throw new Error('無效備份檔');
+                    }
+
+                    for (const old of appState.wardrobe) {
+                        await deleteImageBlob(`front_${old.id}`);
+                        await deleteImageBlob(`back_${old.id}`);
+                    }
+
+                    const newWardrobeMeta = [];
+                    for (const item of imported.wardrobe) {
+                        if (!item || !item.id) continue;
+                        const fBlob = dataUrlToBlob(item.frontImage);
+                        const bBlob = dataUrlToBlob(item.backImage);
+                        if (fBlob) await putImageBlob(`front_${item.id}`, fBlob);
+                        if (bBlob) await putImageBlob(`back_${item.id}`, bBlob);
+                        newWardrobeMeta.push({
+                            id: item.id,
+                            category: item.category || 'top',
+                            name: item.name || '未命名單品',
+                            color: item.color || '經典色',
+                            price: (typeof item.price === 'number' && item.price > 0) ? item.price : null,
+                            washThreshold: item.washThreshold || 2,
+                            care: item.care || '裝洗衣袋柔洗 · 禁高溫烘乾',
+                            notes: item.notes || '',
+                            hasFront: Boolean(fBlob),
+                            hasBack: Boolean(bBlob),
+                            aiDetected: Boolean(item.aiDetected),
+                            wearCount: item.wearCount || 0,
+                            wearsSinceWash: item.wearsSinceWash || 0,
+                            createdAt: item.createdAt || new Date().toISOString()
+                        });
+                    }
+
+                    const base = createDefaultMeta();
+                    appState = {
+                        wardrobe: newWardrobeMeta,
+                        outfits: Array.isArray(imported.outfits) ? imported.outfits : [],
+                        weeklyPlan: imported.weeklyPlan || {},
+                        wearLogs: Array.isArray(imported.wearLogs) ? imported.wearLogs : (Array.isArray(imported.historyLog) ? imported.historyLog : []),
+                        profile: imported.profile ? { ...base.profile, ...imported.profile } : base.profile
+                    };
+
+                    await saveMetaState();
+                    refreshProfileBadge();
+                    renderWardrobeSection();
+                    renderStudioSlots();
+                    renderSavedOutfits();
+                    renderWeeklyPlan();
+                    renderOotdHistoryLog();
+                    closeModal('backup-modal');
+                    showToast(`✅ 還原成功！已將 ${newWardrobeMeta.length} 件單品轉換為二進位 Blob 存入 UltraDB。`);
+                } catch (err) {
+                    showToast('備份檔格式錯誤或損壞，無法還原。', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // =====================================================================
+        // 6. 分頁 1：今日出門決策台 & 穿搭急診室
+        // =====================================================================
+        function adjustTemp(which, delta) {
+            const minInp = getEl('temp-min-input');
+            const maxInp = getEl('temp-max-input');
+            if (!minInp || !maxInp) return;
+            let minV = parseInt(minInp.value, 10) || 16;
+            let maxV = parseInt(maxInp.value, 10) || 22;
+            if (which === 'min') {
+                minV += delta;
+                if (minV > maxV) maxV = minV;
+            } else {
+                maxV += delta;
+                if (maxV < minV) minV = maxV;
+            }
+            minInp.value = minV;
+            maxInp.value = maxV;
+            updateTempBadge();
+        }
+
+        function updateTempBadge() {
+            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 16;
+            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 22;
+            const diff = Math.max(0, maxV - minV);
+            const badge = getEl('temp-dynamic-badge');
+            if (!badge) return;
+            if (maxV >= 27) {
+                badge.textContent = `最高 ${maxV}°C · 透氣防汗單穿優先`;
+            } else if (minV <= 14) {
+                badge.textContent = `最低 ${minV}°C · 重磅保暖多層次`;
+            } else {
+                badge.textContent = `溫差 ${diff}°C · 洋蔥式穿脫邏輯`;
+            }
+        }
+
+        function buildPerfumeAdvice(perfumeName, itinerary, chosenItems) {
+            if (perfumeName === '不噴香水') {
+                return '今日選擇不噴香水。建議可於出門前使用無香體香膏保持清爽，完全不影響任何特殊材質衣物。';
+            }
+            const hasJersey = chosenItems.some(i => /球衣|jersey|排汗|網眼/i.test(`${i.name} ${i.care}`));
+            const hasFurOrKnit = chosenItems.some(i => i.category === 'outerwear' || /毛|絨|針織|燈芯絨/i.test(`${i.name} ${i.care}`));
+            const isHotOrSweaty = /運動|打球|流汗|燒肉|火鍋/i.test(itinerary);
+
+            let points = ['耳後與頸部兩側脈搏點（各 1 下，隨體溫自然散發）', '鎖骨中央皮膚（1 下，隔著內搭透出乾淨體香）'];
+            if (isHotOrSweaty) {
+                points = ['耳後兩側（各 1 下，避開易大量出汗的前胸與腋下）', '膝蓋後方或手腕內側輕點（1 下，走動時香氣由下往上更清爽）'];
+            }
+
+            const warnings = [];
+            if (hasJersey) warnings.push('嚴禁直接噴在球衣隊徽、贊助商燙印或排汗網眼布料上（酒精會加速膠印老化並留下水漬）');
+            if (hasFurOrKnit) warnings.push('切勿近距離噴灑在毛外套絨毛或針織表面（易卡味多日且留香精印；若需留香請距離內襯 30 公分空中噴霧飄落）');
+            if (warnings.length === 0) warnings.push('請噴於皮膚脈搏點後自然風乾，切勿搓揉手腕以免破壞前調層次');
+
+            return `【${perfumeName}】推薦點位：${points.join('；')}。⚠️ 護衣避雷：${warnings.join('；')}。`;
+        }
+
+        async function generateTodayOutfitPlan() {
+            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 16;
+            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 22;
+            const itinerary = (getEl('today-itinerary-input')?.value || '').trim();
+            const perfume = getEl('today-perfume-select')?.value || '大吉嶺淡香精（茶香木質調）';
+
+            const btn = getEl('btn-generate-today');
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ 正在分析氣溫與匹配衣櫥...'; }
+
+            const wardrobeSummary = appState.wardrobe.map(w => ({
+                id: w.id, category: w.category, name: w.name, color: w.color, care: w.care
+            }));
+
+            let aiRes = null;
+            if (resolveApiKey()) {
+                try {
+                    aiRes = await callGeminiAPI(
+                        `你是個人專屬造型師。使用者身高 ${appState.profile.height}cm、偏好 ${appState.profile.style}、褲長偏好 ${appState.profile.fit}。今日氣溫 ${minV}~${maxV}°C，行程：「${itinerary || '日常出門'}」，香水：「${perfume}」。現有衣櫥清單：${JSON.stringify(wardrobeSummary)}。請優先從現有衣櫥挑選單品搭配（若衣櫥為空則給出具體實戰單品公式），並回傳繁體中文 JSON：{"summary":"一句話穿搭組合","reason":"為何適合今日溫差與行程（含穿脫建議）","matchedIds":["衣櫥單品id"],"perfumeGuide":"精準噴灑位置與避開球衣/毛外套提醒"}`
+                    );
+                } catch (e) {}
+            }
+
+            let chosenItems = [];
+            let summary = '';
+            let reason = '';
+            let perfumeGuide = '';
+
+            if (aiRes && aiRes.summary) {
+                summary = aiRes.summary;
+                reason = aiRes.reason || '';
+                perfumeGuide = aiRes.perfumeGuide || '';
+                if (Array.isArray(aiRes.matchedIds)) {
+                    chosenItems = aiRes.matchedIds.map(id => appState.wardrobe.find(w => w.id === id)).filter(Boolean);
+                }
+            } else {
+                const pickCat = (cat) => {
+                    const list = appState.wardrobe.filter(w => w.category === cat);
+                    if (list.length === 0) return null;
+                    if (cat === 'outerwear' && /燒肉|火鍋|油煙/i.test(itinerary)) {
+                        const washable = list.find(i => !/毛|絨|皮草/i.test(i.name));
+                        if (washable) return washable;
+                    }
+                    return list[0];
+                };
+
+                const top = pickCat('top');
+                const outer = minV <= 21 ? pickCat('outerwear') : null;
+                const bottom = pickCat('bottom');
+                const shoes = pickCat('shoes');
+                let underwear = pickCat('underwear');
+                if (bottom && /白|米|淺/i.test(`${bottom.name} ${bottom.color}`)) {
+                    const safeUw = appState.wardrobe.find(w => w.category === 'underwear' && /灰|白|膚|米/i.test(`${w.name} ${w.color}`));
+                    if (safeUw) underwear = safeUw;
+                }
+
+                chosenItems = [outer, top, bottom, underwear, shoes].filter(Boolean);
+
+                if (chosenItems.length >= 2) {
+                    summary = `衣櫥實戰搭配：${chosenItems.map(i => `${i.name}（${i.color}）`).join(' ＋ ')}`;
+                    reason = `針對 ${minV}°C ～ ${maxV}°C 的${maxV - minV >= 5 ? '明顯溫差' : '舒適氣候'}，${outer ? `外層以「${outer.name}」應對早晚微涼，進室內或中午升溫脫掉外套後，內搭「${top ? top.name : '上衣'}」依然保持完整造型比例。` : '單穿清爽透氣不悶熱。'}${itinerary ? `已針對行程「${itinerary}」優化活動度與材質防異味考量。` : ''}`;
+                } else {
+                    summary = minV <= 20
+                        ? `洋蔥式層次配方：外罩寬鬆連帽/立領外套 ＋ 內搭球衣或重磅短 T ＋ 直筒牛仔寬褲 ＋ 復古球鞋`
+                        : `清爽比例配方：寬版球衣或牛津襯衫 ＋ 直筒牛仔寬褲（微蓋鞋舌） ＋ 復古德訓鞋`;
+                    reason = `目前數位衣櫥尚在建檔中，已為您生成符合 ${appState.profile.height}cm 與 ${minV}~${maxV}°C 溫差的黃金比例公式。上傳衣物後將直接抓取您的真實單品！`;
+                }
+                perfumeGuide = buildPerfumeAdvice(perfume, itinerary, chosenItems);
+            }
+
+            setText('today-outfit-summary', summary);
+            setText('today-outfit-reason', reason);
+            setText('today-perfume-guide', perfumeGuide || buildPerfumeAdvice(perfume, itinerary, chosenItems));
+            setText('today-source-tag', chosenItems.length > 0 ? `已匹配 ${chosenItems.length} 件衣櫥單品` : '身形氣候公式');
+
+            const thumbsBox = getEl('today-matched-thumbs');
+            if (thumbsBox) {
+                thumbsBox.innerHTML = chosenItems.map(item => {
+                    const imgUrl = getDisplayImageUrl(`front_${item.id}`);
+                    return `
+                        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-xl bg-editorialCard border border-editorialBorder text-[11px] font-semibold">
+                            ${imgUrl ? `<img src="${imgUrl}" class="w-6 h-6 rounded-md object-cover">` : '<span>👕</span>'}
+                            <span>${escapeHtml(item.name)}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            showEl('today-result-box');
+            if (btn) { btn.disabled = false; btn.textContent = '✨ 生成今日衣櫥配方與香水點位'; }
+        }
+
+        // 穿搭急診室
+        function handleErPhotoUpload(event) {
+            const file = event.target?.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                erPhotoDataUrl = ev.target.result;
+                const badge = getEl('er-photo-badge');
+                if (badge) { badge.classList.remove('hidden'); badge.classList.add('inline-flex'); }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function clearErPhoto() {
+            erPhotoDataUrl = '';
+            if (getEl('er-photo-input')) getEl('er-photo-input').value = '';
+            const badge = getEl('er-photo-badge');
+            if (badge) { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
+        }
+
+        function loadWhiteJeansGuidePreset() {
+            const inp = getEl('er-question-input');
+            if (inp) {
+                inp.value = '我有一件白色直筒牛仔褲，怕穿起來腿短又不知道配什麼上衣、外套和鞋子，請給我直接能出門的實戰搭配與避坑細節！';
+            }
+            runEmergencyRoomSolver();
+        }
+
+        async function runEmergencyRoomSolver() {
+            const q = (getEl('er-question-input')?.value || '').trim();
+            if (!q && !erPhotoDataUrl) {
+                showToast('請先輸入你的穿搭卡關問題或上傳照片喔！', 'error');
+                return;
+            }
+            const btn = getEl('btn-run-er');
+            if (btn) { btn.disabled = true; btn.textContent = '🩺 正在開立實戰處方箋...'; }
+
+            const wardrobeList = appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、');
+            let aiRes = null;
+            if (resolveApiKey()) {
+                try {
+                    aiRes = await callGeminiAPI(
+                        `你是頂尖個人造型顧問，必須給出解決80%以上痛點的實戰答案，嚴禁空泛廢話。使用者檔案：${JSON.stringify(appState.profile)}。使用者現有衣櫥：${wardrobeList || '尚未建檔'}。問題：「${q || '請診斷這張照片的穿搭問題並給出改造方案'}」。請回傳繁體中文 JSON：{"diagnosis":"痛點根源精準診斷","recipes":[{"tag":"配方標籤","title":"完整單品組合","why":"為何這樣配能修飾比例"}],"tweaks":["30秒實穿微調指令1","指令2","指令3"],"donts":["地雷避坑1","避坑2","避坑3"]}`,
+                        erPhotoDataUrl ? [erPhotoDataUrl] : []
+                    );
+                } catch (e) {}
+            }
+
+            if (aiRes && aiRes.diagnosis && Array.isArray(aiRes.recipes)) {
+                setText('er-diagnosis-text', aiRes.diagnosis);
+                const listEl = getEl('er-recipes-list');
+                if (listEl) {
+                    listEl.innerHTML = aiRes.recipes.slice(0, 3).map((r, i) => `
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md ${i === 0 ? 'bg-editorialText' : i === 1 ? 'bg-editorialAccent' : 'bg-zinc-700'} text-white text-[10px] font-bold">${escapeHtml(r.tag || `配方 ${i + 1}`)}</span>
+                            <h4 class="text-xs font-bold text-editorialText">${escapeHtml(r.title)}</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">${escapeHtml(r.why)}</p>
+                        </div>
+                    `).join('');
+                }
+                const tweaksEl = getEl('er-tweaks-list');
+                if (tweaksEl && Array.isArray(aiRes.tweaks)) {
+                    tweaksEl.innerHTML = aiRes.tweaks.map(t => `<li>${escapeHtml(t)}</li>`).join('');
+                }
+                const dontsEl = getEl('er-donts-list');
+                if (dontsEl && Array.isArray(aiRes.donts)) {
+                    dontsEl.innerHTML = aiRes.donts.map(d => `<li>${escapeHtml(d)}</li>`).join('');
+                }
+            } else {
+                const isWhiteJeans = /白.*褲|牛仔褲/i.test(q);
+                const isFurCoat = /毛外套|絨毛|皮草/i.test(q);
+                if (isWhiteJeans) {
+                    setText('er-diagnosis-text', '白色直筒牛仔褲最大的視覺風險在於「淺色橫向膨脹感」與「上半身壓不住重心導致頭輕腳重」，若褲腳堆積在腳踝更會直接截斷腿長。解決關鍵是：上半身用深色或強視覺單品壓住重心、褲腳維持微蓋鞋舌，並搭配淺灰/純白內褲防透色。');
+                    getEl('er-recipes-list').innerHTML = `
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold">配方 A · Blokecore</span>
+                            <h4 class="text-xs font-bold text-editorialText">深色球衣 ＋ 白色直筒牛仔褲 ＋ 復古球鞋</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">深色球衣隊徽與線條鎖住視覺重心，白褲把競技感轉化為高級街頭休閒風。</p>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold">配方 B · City Boy</span>
+                            <h4 class="text-xs font-bold text-editorialText">淺灰重磅連帽外套 ＋ 內搭白 T ＋ 白褲</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">連帽外套的厚磅挺度把視線往上拉高，內搭白 T 下擺微露 2 公分製造乾淨層次。</p>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold">配方 C · Ivy 微正裝</span>
+                            <h4 class="text-xs font-bold text-editorialText">水藍牛津襯衫 ＋ 白褲 ＋ 黑色皮鞋/靴</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">水藍＋純白最顯氣色質感，黑色鞋靴收尾增加份量感，瞬間穿出修長大人感。</p>
+                        </div>`;
+                } else if (isFurCoat) {
+                    setText('er-diagnosis-text', '仿皮草毛外套本身體積感大、立領厚實，若將拉鍊拉太高或領子立起來會直接遮住脖子並讓上半身顯得圓潤擁擠。只要降低領口高度並平衡下身分量，就能把街頭氣場拉滿。');
+                    getEl('er-recipes-list').innerHTML = `
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold">配方 A · 三明治呼應</span>
+                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套（拉鍊半開）＋ 亮色球衣 ＋ 黑色寬褲 ＋ 同色系鞋</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">外套與寬褲形成黑色縱向延伸顯高，內搭球衣與鞋款上下色彩呼應。</p>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold">配方 B · 黑白高對比</span>
+                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套 ＋ 白色連帽/素 T ＋ 白色直筒牛仔褲</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">內層全白延伸身高線條，外罩黑色毛外套增加冬日街頭層次感。</p>
+                        </div>
+                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
+                            <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold">配方 C · 美式街頭</span>
+                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套 ＋ 復古印花短 T ＋ 水洗灰寬褲 ＋ 棒球帽</h4>
+                            <p class="text-[11px] text-editorialMuted leading-relaxed">水洗灰過渡黑與亮色，搭配棒球帽平衡毛外套的肩膀膨脹感。</p>
+                        </div>`;
+                } else {
+                    setText('er-diagnosis-text', `針對您的問題「${q}」：在 169 cm 身高條件下，穿搭卡關通常源自「上下身視覺重心失衡」或「同色系缺乏材質層次對比」。透過『外深內亮』或『上寬下直筒＋微蓋鞋舌』即可立刻優化全身比例。`);
+                }
+            }
+
+            if (btn) { btn.disabled = false; btn.textContent = '🩺 立即開立實戰處方箋'; }
+            showToast('已更新實戰處方箋！');
+        }
+
+        // =====================================================================
+        // 7. 分頁 2：我的數位衣櫥 + 排隊批次 AI 辨識引擎
+        // =====================================================================
+        function refreshWardrobeStatsAndAnalytics() {
+            const items = appState.wardrobe;
+            setText('nav-wardrobe-count', `${items.length}`);
+            setText('kpi-total-items', `${items.length} 件`);
+            updateStorageStatsUI();
+
+            const pricedItems = items.filter(i => typeof i.price === 'number' && !isNaN(i.price) && i.price > 0);
+            if (pricedItems.length === 0) {
+                setText('kpi-total-value', '尚未標價');
+            } else {
+                const sum = pricedItems.reduce((acc, i) => acc + i.price, 0);
+                setText('kpi-total-value', `NT$ ${sum.toLocaleString()}`);
+            }
+
+            const needWash = items.filter(i => (i.wearsSinceWash || 0) >= (i.washThreshold || 2)).length;
+            setText('kpi-wash-count', `${needWash} 件`);
+
+            const wornList = [...items].filter(i => (i.wearCount || 0) > 0).sort((a, b) => b.wearCount - a.wearCount);
+            if (wornList.length > 0) {
+                setText('analytics-mvp-text', `${wornList[0].name}（建檔後已穿 ${wornList[0].wearCount} 次）`);
+            } else {
+                setText('analytics-mvp-text', '尚無穿著紀錄（點擊卡片「+1 穿著」開始累計）');
+            }
+
+            const coldList = items.filter(i => (i.wearCount || 0) === 0 && i.category !== 'underwear' && i.category !== 'socks');
+            if (coldList.length > 0) {
+                setText('analytics-cold-text', `${coldList[0].name}（目前穿 0 次，共 ${coldList.length} 件待啟用）`);
+            } else if (items.length > 0) {
+                setText('analytics-cold-text', '太棒了！衣櫥所有主力單品都已經穿過囉');
+            } else {
+                setText('analytics-cold-text', '上傳衣物後將自動追蹤使用率');
+            }
+
+            // 更新「一鍵 AI 辨識未命名衣物」按鈕上的待辨識數量提示
+            const bulkBtn = getEl('btn-bulk-ai-wardrobe');
+            if (bulkBtn && !bulkBtn.disabled) {
+                const pendingCount = items.filter(i => i.hasFront && isItemNeedsAiDetection(i)).length;
+                bulkBtn.textContent = pendingCount > 0
+                    ? `✨ 一鍵 AI 辨識未命名衣物 (${pendingCount} 件)`
+                    : '✨ 一鍵 AI 重新辨識全部衣物';
+            }
+        }
+
+        // 一鍵排隊辨識衣櫥中尚未辨識的單品（救回批次匯入沒偵測到的衣服）
+        async function runBulkAiRecognizeWardrobe() {
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上你的 Gemini API 金鑰才能啟動 AI 辨識！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+            if (appState.wardrobe.length === 0) {
+                showToast('衣櫥目前還是空的喔！', 'error');
+                return;
+            }
+
+            let targets = appState.wardrobe.filter(i => i.hasFront && isItemNeedsAiDetection(i));
+            if (targets.length === 0) {
+                targets = appState.wardrobe.filter(i => i.hasFront);
+            }
+
+            wardrobeBulkAiAbort = false;
+            const bulkBtn = getEl('btn-bulk-ai-wardrobe');
+            if (bulkBtn) bulkBtn.disabled = true;
+
+            showEl('wardrobe-ai-queue-banner');
+            let successCount = 0;
+            let failCount = 0;
+
+            for (let idx = 0; idx < targets.length; idx++) {
+                if (wardrobeBulkAiAbort) break;
+                const item = targets[idx];
+                const pct = Math.round(((idx) / targets.length) * 100);
+                setText('wardrobe-ai-queue-status', `⏳ 排隊 AI 辨識中：第 ${idx + 1} / ${targets.length} 件（${item.name}）...`);
+                const barEl = getEl('wardrobe-ai-queue-bar');
+                if (barEl) barEl.style.width = `${pct}%`;
+
+                wardrobeBusyItemIds.add(item.id);
+                renderWardrobeGrid();
+
+                try {
+                    const fBlob = await getImageBlob(`front_${item.id}`);
+                    const bBlob = item.hasBack ? await getImageBlob(`back_${item.id}`) : null;
+                    const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob);
+                    if (detected && detected.name) {
+                        item.category = detected.category;
+                        item.name = detected.name;
+                        item.color = detected.color;
+                        item.care = detected.care;
+                        if (detected.notes && !item.notes) item.notes = detected.notes;
+                        item.washThreshold = CATEGORY_META[detected.category]?.defaultThreshold || item.washThreshold;
+                        item.aiDetected = true;
+                        successCount++;
+                        await saveMetaState();
+                    } else {
+                        failCount++;
+                    }
+                } catch (err) {
+                    failCount++;
+                    if (/not found|API key|403|400/i.test(err.message || '')) {
+                        showToast(`已停止辨識：${err.message}`, 'error');
+                        wardrobeBusyItemIds.delete(item.id);
+                        break;
+                    }
+                } finally {
+                    wardrobeBusyItemIds.delete(item.id);
+                    renderWardrobeGrid();
+                }
+
+                // 排隊間隔 650ms，避免觸發免費 API 每分鐘請求上限
+                if (idx < targets.length - 1 && !wardrobeBulkAiAbort) {
+                    await new Promise(r => setTimeout(r, 650));
+                }
+            }
+
+            const barEl = getEl('wardrobe-ai-queue-bar');
+            if (barEl) barEl.style.width = '100%';
+            hideEl('wardrobe-ai-queue-banner');
+            if (bulkBtn) bulkBtn.disabled = false;
+            refreshWardrobeStatsAndAnalytics();
+            renderWardrobeGrid();
+
+            if (wardrobeBulkAiAbort) {
+                showToast(`已手動停止辨識（已完成 ${successCount} 件）。`);
+            } else {
+                showToast(`✅ 排隊辨識完成！成功辨識 ${successCount} 件${failCount > 0 ? `，略過 ${failCount} 件` : ''}。`);
+            }
+        }
+
+        function stopBulkAiRecognizeWardrobe() {
+            wardrobeBulkAiAbort = true;
+            setText('wardrobe-ai-queue-status', '正在安全停止目前單品後結束...');
+        }
+
+        // 單件衣物卡片手動觸發「AI 重辨識」
+        async function aiReDetectSingleCardItem(itemId) {
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上 Gemini API 金鑰！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+            const item = appState.wardrobe.find(i => i.id === itemId);
+            if (!item || !item.hasFront) return;
+
+            wardrobeBusyItemIds.add(item.id);
+            renderWardrobeGrid();
+
+            try {
+                const fBlob = await getImageBlob(`front_${item.id}`);
+                const bBlob = item.hasBack ? await getImageBlob(`back_${item.id}`) : null;
+                const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob);
+                if (detected && detected.name) {
+                    item.category = detected.category;
+                    item.name = detected.name;
+                    item.color = detected.color;
+                    item.care = detected.care;
+                    if (detected.notes) item.notes = detected.notes;
+                    item.aiDetected = true;
+                    await saveMetaState();
+                    showToast(`✨ 已更新辨識為：「${item.name}」（${CATEGORY_META[item.category]?.label}）`);
+                } else {
+                    showToast('AI 暫時無法辨識此圖片，請手動編輯名稱。', 'error');
+                }
+            } catch (err) {
+                showToast(`辨識失敗：${err.message}`, 'error');
+            } finally {
+                wardrobeBusyItemIds.delete(item.id);
+                refreshWardrobeStatsAndAnalytics();
+                renderWardrobeGrid();
+            }
+        }
+
+        function rescueColdWardrobeItem() {
+            const cold = appState.wardrobe.find(i => (i.wearCount || 0) === 0 && i.category !== 'underwear' && i.category !== 'socks');
+            if (!cold) {
+                showToast('目前沒有穿 0 次的冷宮單品，或衣櫥尚未建檔喔！');
+                return;
+            }
+            switchTab('today');
+            const inp = getEl('er-question-input');
+            if (inp) {
+                inp.value = `我衣櫥裡有一件「${cold.name}（${cold.color}）」買來還沒穿過（0 次），請幫我搭配出 3 套最帥、最能融入我日常風格的出門穿法！`;
+            }
+            runEmergencyRoomSolver();
+        }
+
+        function setWardrobeFilter(cat) {
+            activeFilterCat = cat;
+            document.querySelectorAll('.w-filter-btn').forEach(btn => {
+                const active = btn.getAttribute('data-cat') === cat;
+                btn.className = active
+                    ? 'w-filter-btn px-3 py-1.5 rounded-full text-xs font-bold bg-editorialText text-white'
+                    : 'w-filter-btn px-3 py-1.5 rounded-full text-xs font-medium bg-editorialBg border border-editorialBorder text-editorialText hover:bg-editorialSand';
+            });
+            renderWardrobeGrid();
+        }
+
+        function handleWardrobeSearch(val) {
+            activeSearchQuery = (val || '').trim().toLowerCase();
+            renderWardrobeGrid();
+        }
+
+        function toggleAddSingleCard(force) {
+            const card = getEl('add-single-card');
+            if (!card) return;
+            if (typeof force === 'boolean') {
+                card.classList.toggle('hidden', !force);
+            } else {
+                card.classList.toggle('hidden');
+            }
+        }
+
+        function onNewItemCategoryChange(cat) {
+            const meta = CATEGORY_META[cat] || CATEGORY_META.top;
+            if (getEl('new-item-threshold')) getEl('new-item-threshold').value = meta.defaultThreshold;
+            if (getEl('new-item-care')) getEl('new-item-care').value = meta.defaultCare;
+
+            if (cat === 'underwear' || cat === 'socks') {
+                hideEl('new-back-upload-col');
+                showEl('single-side-hint-bar');
+            } else {
+                showEl('new-back-upload-col');
+                hideEl('single-side-hint-bar');
+            }
+        }
+
+        async function handleNewDualFile(event, side) {
+            const file = event.target?.files?.[0];
+            if (!file) return;
+            try {
+                const blob = await compressImageToBlob(file, 640, 0.78);
+                const previewUrl = URL.createObjectURL(blob);
+                if (side === 'front') {
+                    newFrontBlob = blob;
+                    const img = getEl('new-front-preview');
+                    if (img) { img.src = previewUrl; img.classList.remove('hidden'); }
+                    hideEl('new-front-placeholder');
+                    showEl('btn-rm-front');
+                } else {
+                    newBackBlob = blob;
+                    const img = getEl('new-back-preview');
+                    if (img) { img.src = previewUrl; img.classList.remove('hidden'); }
+                    hideEl('new-back-placeholder');
+                    showEl('btn-rm-back');
+                }
+            } catch (e) {
+                showToast('圖片讀取失敗，請換一張試試。', 'error');
+            }
+        }
+
+        function clearNewPhoto(side) {
+            if (side === 'front') {
+                newFrontBlob = null;
+                if (getEl('new-front-file')) getEl('new-front-file').value = '';
+                const img = getEl('new-front-preview');
+                if (img) { img.src = ''; img.classList.add('hidden'); }
+                showEl('new-front-placeholder');
+                hideEl('btn-rm-front');
+            } else {
+                newBackBlob = null;
+                if (getEl('new-back-file')) getEl('new-back-file').value = '';
+                const img = getEl('new-back-preview');
+                if (img) { img.src = ''; img.classList.add('hidden'); }
+                showEl('new-back-placeholder');
+                hideEl('btn-rm-back');
+            }
+        }
+
+        async function aiDetectNewSingleItem() {
+            if (!newFrontBlob) {
+                showToast('請先上傳「正面照」再執行 AI 辨識喔！', 'error');
+                return;
+            }
+            if (!resolveApiKey()) {
+                showToast('未設定雲端 API 金鑰，請先點右上角「🔑 API」設定！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+            const btn = getEl('btn-ai-detect-single');
+            if (btn) { btn.disabled = true; btn.textContent = '✨ AI 正在合併分析正反面細節...'; }
+            try {
+                const ai = await detectGarmentDetailsFromBlobs(newFrontBlob, newBackBlob);
+                if (ai && CATEGORY_META[ai.category]) {
+                    if (getEl('new-item-cat')) getEl('new-item-cat').value = ai.category;
+                    onNewItemCategoryChange(ai.category);
+                    if (ai.name && getEl('new-item-name')) getEl('new-item-name').value = ai.name;
+                    if (ai.color && getEl('new-item-color')) getEl('new-item-color').value = ai.color;
+                    if (ai.care && getEl('new-item-care')) getEl('new-item-care').value = ai.care;
+                    if (ai.notes && getEl('new-item-notes')) getEl('new-item-notes').value = ai.notes;
+                    showToast('✨ AI 已自動填入單品分類、名稱與洗護建議！');
+                }
+            } catch (err) {
+                showToast(`辨識失敗：${err.message}`, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '✨ AI 雙面自動辨識名稱與洗護建議'; }
+            }
+        }
+
+        async function saveNewWardrobeItem() {
+            const category = getEl('new-item-cat')?.value || 'top';
+            const name = (getEl('new-item-name')?.value || '').trim();
+            const color = (getEl('new-item-color')?.value || '').trim() || '經典色';
+            const rawPrice = (getEl('new-item-price')?.value || '').trim();
+            const price = (rawPrice !== '' && !isNaN(Number(rawPrice)) && Number(rawPrice) > 0) ? Number(rawPrice) : null;
+            const washThreshold = Math.max(1, parseInt(getEl('new-item-threshold')?.value, 10) || CATEGORY_META[category].defaultThreshold);
+            const care = (getEl('new-item-care')?.value || '').trim() || CATEGORY_META[category].defaultCare;
+            const notes = (getEl('new-item-notes')?.value || '').trim();
+
+            if (!newFrontBlob) {
+                showToast('請先上傳「正面照 (必選)」喔！', 'error');
+                return;
+            }
+            if (!name) {
+                showToast('請填寫單品名稱！', 'error');
+                getEl('new-item-name')?.focus();
+                return;
+            }
+
+            const id = 'w_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+            await putImageBlob(`front_${id}`, newFrontBlob);
+            if (newBackBlob) {
+                await putImageBlob(`back_${id}`, newBackBlob);
+            }
+
+            const itemMeta = {
+                id,
+                category,
+                name,
+                color,
+                price,
+                washThreshold,
+                care,
+                notes,
+                hasFront: true,
+                hasBack: Boolean(newBackBlob),
+                aiDetected: true,
+                wearCount: 0,
+                wearsSinceWash: 0,
+                createdAt: new Date().toISOString()
+            };
+
+            appState.wardrobe.unshift(itemMeta);
+            await saveMetaState();
+
+            clearNewPhoto('front');
+            clearNewPhoto('back');
+            if (getEl('new-item-name')) getEl('new-item-name').value = '';
+            if (getEl('new-item-color')) getEl('new-item-color').value = '';
+            if (getEl('new-item-price')) getEl('new-item-price').value = '';
+            if (getEl('new-item-notes')) getEl('new-item-notes').value = '';
+            toggleAddSingleCard(false);
+            renderWardrobeSection();
+            showToast(`已收入 UltraDB 二進位衣櫥：「${name}」（建檔後穿 0 次起算）`);
+        }
+
+        function flipWardrobeCard(itemId) {
+            const item = appState.wardrobe.find(i => i.id === itemId);
+            if (!item || !item.hasBack) return;
+            cardBackViewMap[itemId] = !cardBackViewMap[itemId];
+            renderWardrobeGrid();
+        }
+
+        function startSupplementBack(itemId) {
+            supplementTargetId = itemId;
+            const inp = getEl('global-supplement-back-input');
+            if (inp) { inp.value = ''; inp.click(); }
+        }
+
+        async function onSupplementBackChosen(event) {
+            const file = event.target?.files?.[0];
+            if (!file || !supplementTargetId) return;
+            try {
+                const blob = await compressImageToBlob(file, 640, 0.78);
+                const item = appState.wardrobe.find(i => i.id === supplementTargetId);
+                if (item) {
+                    await putImageBlob(`back_${item.id}`, blob);
+                    item.hasBack = true;
+                    cardBackViewMap[item.id] = true;
+                    await saveMetaState();
+                    renderWardrobeGrid();
+                    showToast(`已為「${item.name}」補傳背面照！點擊圖片可隨時切換正反面。`);
+                }
+            } catch (e) {
+                showToast('補傳背面照失敗，請再試一次。', 'error');
+            } finally {
+                supplementTargetId = null;
+            }
+        }
+
+        function syncEditModalDualPreviews(itemId) {
+            const fImg = getEl('edit-front-preview');
+            const fPh = getEl('edit-front-placeholder');
+            const frontUrl = editFrontBlob ? URL.createObjectURL(editFrontBlob) : getDisplayImageUrl(`front_${itemId}`);
+            if (fImg && fPh) {
+                if (frontUrl) {
+                    fImg.src = frontUrl;
+                    fImg.classList.remove('hidden');
+                    fPh.classList.add('hidden');
+                } else {
+                    fImg.src = '';
+                    fImg.classList.add('hidden');
+                    fPh.classList.remove('hidden');
+                }
+            }
+
+            const bImg = getEl('edit-back-preview');
+            const bPh = getEl('edit-back-placeholder');
+            const bRm = getEl('btn-edit-rm-back');
+            const backUrl = editBackBlob
+                ? URL.createObjectURL(editBackBlob)
+                : (editKeepExistingBack ? getDisplayImageUrl(`back_${itemId}`) : '');
+
+            if (bImg && bPh) {
+                if (backUrl) {
+                    bImg.src = backUrl;
+                    bImg.classList.remove('hidden');
+                    bPh.classList.add('hidden');
+                    if (bRm) bRm.classList.remove('hidden');
+                } else {
+                    bImg.src = '';
+                    bImg.classList.add('hidden');
+                    bPh.classList.remove('hidden');
+                    if (bRm) bRm.classList.add('hidden');
+                }
+            }
+        }
+
+        async function handleEditDualFile(event, side) {
+            const file = event.target?.files?.[0];
+            const id = getEl('edit-item-id')?.value;
+            if (!file || !id) return;
+            try {
+                const blob = await compressImageToBlob(file, 640, 0.78);
+                if (side === 'front') editFrontBlob = blob;
+                else {
+                    editBackBlob = blob;
+                    editKeepExistingBack = false;
+                }
+                syncEditModalDualPreviews(id);
+            } catch (e) {
+                showToast('圖片讀取失敗，請換一張試試。', 'error');
+            }
+        }
+
+        function clearEditBackPhoto() {
+            const id = getEl('edit-item-id')?.value;
+            editBackBlob = null;
+            editKeepExistingBack = false;
+            if (getEl('edit-back-file')) getEl('edit-back-file').value = '';
+            if (id) syncEditModalDualPreviews(id);
+        }
+
+        function openEditItemModal(itemId) {
+            const item = appState.wardrobe.find(i => i.id === itemId);
+            if (!item) return;
+            if (getEl('edit-item-id')) getEl('edit-item-id').value = item.id;
+            if (getEl('edit-item-cat')) getEl('edit-item-cat').value = item.category;
+            if (getEl('edit-item-color')) getEl('edit-item-color').value = item.color || '';
+            if (getEl('edit-item-name')) getEl('edit-item-name').value = item.name || '';
+            if (getEl('edit-item-price')) getEl('edit-item-price').value = (typeof item.price === 'number' && item.price > 0) ? item.price : '';
+            if (getEl('edit-item-threshold')) getEl('edit-item-threshold').value = item.washThreshold || 2;
+            if (getEl('edit-item-care')) getEl('edit-item-care').value = item.care || '';
+            if (getEl('edit-item-notes')) getEl('edit-item-notes').value = item.notes || '';
+
+            editFrontBlob = null;
+            editBackBlob = null;
+            editKeepExistingBack = Boolean(item.hasBack);
+            syncEditModalDualPreviews(item.id);
+            openModal('edit-item-modal');
+        }
+
+        async function saveEditedWardrobeItem() {
+            const id = getEl('edit-item-id')?.value;
+            const item = appState.wardrobe.find(i => i.id === id);
+            if (!item) return;
+
+            const name = (getEl('edit-item-name')?.value || '').trim();
+            if (!name) {
+                showToast('單品名稱不能為空白！', 'error');
+                return;
+            }
+            const rawP = (getEl('edit-item-price')?.value || '').trim();
+            item.category = getEl('edit-item-cat')?.value || item.category;
+            item.color = (getEl('edit-item-color')?.value || '').trim() || '經典色';
+            item.name = name;
+            item.price = (rawP !== '' && !isNaN(Number(rawP)) && Number(rawP) > 0) ? Number(rawP) : null;
+            item.washThreshold = Math.max(1, parseInt(getEl('edit-item-threshold')?.value, 10) || 2);
+            item.care = (getEl('edit-item-care')?.value || '').trim();
+            item.notes = (getEl('edit-item-notes')?.value || '').trim();
+            item.aiDetected = true;
+
+            if (editFrontBlob) {
+                await putImageBlob(`front_${item.id}`, editFrontBlob);
+                item.hasFront = true;
+            }
+            if (editBackBlob) {
+                await putImageBlob(`back_${item.id}`, editBackBlob);
+                item.hasBack = true;
+            } else if (!editKeepExistingBack) {
+                await deleteImageBlob(`back_${item.id}`);
+                item.hasBack = false;
+                delete cardBackViewMap[item.id];
+            }
+
+            await saveMetaState();
+            renderWardrobeSection();
+            closeModal('edit-item-modal');
+            showToast(`已更新「${item.name}」的資訊與雙照！`);
+        }
+
+        async function incrementItemWear(itemId) {
+            const item = appState.wardrobe.find(i => i.id === itemId);
+            if (!item) return;
+            item.wearCount = (item.wearCount || 0) + 1;
+            item.wearsSinceWash = (item.wearsSinceWash || 0) + 1;
+            await saveMetaState();
+            renderWardrobeSection();
+            if (item.wearsSinceWash >= (item.washThreshold || 2)) {
+                showToast(`🧼 「${item.name}」已穿 ${item.wearsSinceWash} 次，建議進行洗護保養！`);
+            } else {
+                showToast(`已記錄「${item.name}」穿著 +1（建檔後穿 ${item.wearCount} 次）`);
+            }
+        }
+
+        async function resetItemWash(itemId) {
+            const item = appState.wardrobe.find(i => i.id === itemId);
+            if (!item) return;
+            item.wearsSinceWash = 0;
+            await saveMetaState();
+            renderWardrobeSection();
+            showToast(`✨ 「${item.name}」已完成洗護，計數已歸零！`);
+        }
+
+        async function deleteWardrobeItem(itemId) {
+            appState.wardrobe = appState.wardrobe.filter(i => i.id !== itemId);
+            STUDIO_SLOTS.forEach(s => { if (studioSlotIds[s] === itemId) studioSlotIds[s] = null; });
+            await deleteImageBlob(`front_${itemId}`);
+            await deleteImageBlob(`back_${itemId}`);
+            await saveMetaState();
+            renderWardrobeSection();
+            showToast('已刪除該單品並釋放二進位圖庫空間。');
+        }
+
+        function confirmClearAllWardrobe() {
+            if (appState.wardrobe.length === 0) {
+                showToast('衣櫥目前已經是 0 件純淨空白狀態囉！');
+                return;
+            }
+            showEl('clear-all-confirm-bar');
+        }
+
+        async function executeClearAllWardrobe() {
+            for (const item of appState.wardrobe) {
+                await deleteImageBlob(`front_${item.id}`);
+                await deleteImageBlob(`back_${item.id}`);
+            }
+            appState.wardrobe = [];
+            cardBackViewMap = {};
+            STUDIO_SLOTS.forEach(s => { studioSlotIds[s] = null; });
+            await saveMetaState();
+            renderWardrobeSection();
+            hideEl('clear-all-confirm-bar');
+            showToast('已清空全部衣櫥單品。');
+        }
+
+        function renderWardrobeSection() {
+            refreshWardrobeStatsAndAnalytics();
+            renderWardrobeGrid();
+        }
+
+        function renderWardrobeGrid() {
+            const grid = getEl('wardrobe-grid');
+            if (!grid) return;
+
+            let list = activeFilterCat === 'all'
+                ? appState.wardrobe
+                : appState.wardrobe.filter(i => i.category === activeFilterCat);
+
+            if (activeSearchQuery) {
+                list = list.filter(i => {
+                    const hay = `${i.name || ''} ${i.color || ''} ${i.notes || ''} ${CATEGORY_META[i.category]?.label || ''}`.toLowerCase();
+                    return hay.includes(activeSearchQuery);
+                });
+            }
+
+            if (list.length === 0) {
+                const isTotalEmpty = appState.wardrobe.length === 0;
+                grid.innerHTML = `
+                    <div class="col-span-full bg-editorialCard rounded-3xl border border-dashed border-editorialBorder p-10 text-center space-y-3">
+                        <div class="text-3xl">🧥</div>
+                        <h3 class="text-sm font-bold text-editorialText">${isTotalEmpty ? '你的私人數位衣櫥目前為 0 件（UltraDB 二進位圖庫已就緒）' : '找不到符合條件的單品'}</h3>
+                        <p class="text-xs text-editorialMuted max-w-md mx-auto leading-relaxed">
+                            上傳你現有的上衣、外套、下身、內褲、襪子、鞋子與配件。採用原生二進位 Blob 獨立儲存（支援 1,000+ 件正反面雙照），徹底告別 5MB 容量上限。
+                        </p>
+                        <div class="pt-2 flex flex-wrap justify-center gap-2">
+                            <button type="button" onclick="toggleAddSingleCard(true)" class="px-4 py-2 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold transition">+ 新增第一件單品</button>
+                            <button type="button" onclick="openModal('batch-modal')" class="px-4 py-2 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-editorialText text-xs font-bold transition">📦 多圖批次匯入</button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = list.map(item => {
+                const showBack = Boolean(item.hasBack && cardBackViewMap[item.id]);
+                const imgUrl = showBack ? getDisplayImageUrl(`back_${item.id}`) : getDisplayImageUrl(`front_${item.id}`);
+                const catLabel = CATEGORY_META[item.category]?.label || '單品';
+                const priceLabel = (typeof item.price === 'number' && item.price > 0) ? `NT$ ${item.price.toLocaleString()}` : '未標價';
+                const wearsSinceWash = item.wearsSinceWash || 0;
+                const threshold = item.washThreshold || 2;
+                const needsWash = wearsSinceWash >= threshold;
+                const isBusy = wardrobeBusyItemIds.has(item.id);
+
+                return `
+                    <div class="bg-editorialCard rounded-2xl border ${needsWash ? 'border-amber-400' : 'border-editorialBorder'} overflow-hidden flex flex-col justify-between card-hover">
+                        <div>
+                            <!-- 圖片區 -->
+                            <div onclick="${item.hasBack ? `flipWardrobeCard('${item.id}')` : ''}" class="relative h-52 bg-editorialBg overflow-hidden ${item.hasBack ? 'cursor-pointer' : ''} group">
+                                ${imgUrl
+                                    ? `<img src="${imgUrl}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">`
+                                    : `<div class="w-full h-full flex items-center justify-center text-3xl text-editorialMuted">👕</div>`}
+
+                                <!-- 左上分類與面數徽章 -->
+                                <div class="absolute top-2.5 left-2.5 flex items-center gap-1">
+                                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-editorialText/85 text-white backdrop-blur-xs">${catLabel}</span>
+                                    ${item.hasBack
+                                        ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${showBack ? 'bg-editorialAccent text-white' : 'bg-white/90 text-editorialText'} shadow-xs">${showBack ? '背面 BACK' : '正面 FRONT'}</span>`
+                                        : ''}
+                                </div>
+
+                                <!-- 右上洗護狀態徽章 -->
+                                ${needsWash
+                                    ? `<span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">🧼 該洗護了</span>`
+                                    : ''}
+
+                                <!-- 左下翻面或補傳背面按鈕 -->
+                                <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1">
+                                    ${item.hasBack
+                                        ? `<button type="button" onclick="event.stopPropagation(); flipWardrobeCard('${item.id}')" class="px-2.5 py-1 rounded-lg bg-white/95 hover:bg-editorialText hover:text-white text-editorialText text-[10px] font-bold shadow-xs transition">🔄 ${showBack ? '翻回正面' : '翻看背面'}</button>`
+                                        : `<button type="button" onclick="event.stopPropagation(); startSupplementBack('${item.id}')" class="px-2.5 py-1 rounded-lg bg-white/90 hover:bg-editorialSand text-editorialMuted hover:text-editorialText text-[10px] font-semibold shadow-xs transition">+ 補傳背面</button>`}
+                                    <button type="button" ${isBusy ? 'disabled' : ''} onclick="event.stopPropagation(); aiReDetectSingleCardItem('${item.id}')" class="px-2 py-1 rounded-lg bg-white/95 hover:bg-amber-100 text-amber-900 text-[10px] font-bold shadow-xs transition">
+                                        ${isBusy ? '⏳ 辨識中...' : '✨ AI重辨識'}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 文字資訊區 -->
+                            <div class="p-3.5 space-y-1.5">
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="text-sm font-bold text-editorialText leading-snug line-clamp-1">${escapeHtml(item.name)}</h4>
+                                    <span class="text-[11px] font-semibold text-editorialMuted shrink-0">${priceLabel}</span>
+                                </div>
+                                <div class="flex flex-wrap items-center gap-1.5 text-[11px] text-editorialMuted">
+                                    <span class="px-2 py-0.5 rounded-md bg-editorialBg border border-editorialBorder">${escapeHtml(item.color || '經典色')}</span>
+                                    <span>建檔後穿 <strong class="text-editorialText">${item.wearCount || 0}</strong> 次</span>
+                                </div>
+                                ${item.notes ? `<p class="text-[11px] text-editorialAccent line-clamp-1">📌 ${escapeHtml(item.notes)}</p>` : ''}
+                                <p class="text-[10px] text-editorialMuted line-clamp-1">🛡️ ${escapeHtml(item.care || '')}</p>
+                            </div>
+                        </div>
+
+                        <!-- 底部操作列 -->
+                        <div class="px-3.5 py-2.5 bg-editorialBg/70 border-t border-editorialBorder flex items-center justify-between gap-1.5">
+                            <button type="button" onclick="incrementItemWear('${item.id}')" class="px-2.5 py-1 rounded-lg bg-editorialText hover:bg-editorialAccent text-white text-[11px] font-bold transition">
+                                +1 穿著
+                            </button>
+                            <div class="flex items-center gap-1">
+                                ${needsWash
+                                    ? `<button type="button" onclick="resetItemWash('${item.id}')" class="px-2 py-1 rounded-lg bg-emerald-600 text-white text-[10px] font-bold">完成洗護</button>`
+                                    : ''}
+                                <button type="button" onclick="openEditItemModal('${item.id}')" class="px-2 py-1 rounded-lg bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-[11px] font-semibold text-editorialText">編輯</button>
+                                <button type="button" onclick="deleteWardrobeItem('${item.id}')" class="px-2 py-1 rounded-lg bg-editorialCard hover:bg-rose-50 border border-editorialBorder text-[11px] font-semibold text-rose-600">刪</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 多圖批次匯入（階段一：全部壓縮建草稿；階段二：排隊佇列逐件 AI 辨識）
+        async function handleBatchFilesSelected(event) {
+            const files = Array.from(event.target?.files || []);
+            if (files.length === 0) return;
+
+            batchDrafts = [];
+            batchAiAbort = false;
+            const saveBtn = getEl('btn-commit-batch');
+            const barEl = getEl('batch-progress-bar');
+            showEl('batch-progress-box');
+            if (saveBtn) saveBtn.disabled = true;
+
+            // 階段一：快速壓縮建立草稿清單
+            for (let i = 0; i < files.length; i++) {
+                setText('batch-progress-text', `正在壓縮建立草稿第 ${i + 1} / ${files.length} 張...`);
+                if (barEl) barEl.style.width = `${Math.round(((i + 1) / files.length) * 30)}%`;
+                try {
+                    const blob = await compressImageToBlob(files[i], 640, 0.78);
+                    const previewUrl = URL.createObjectURL(blob);
+                    batchDrafts.push({
+                        frontBlob: blob,
+                        frontPreviewUrl: previewUrl,
+                        backBlob: null,
+                        category: 'top',
+                        name: files[i].name.replace(/\.[^/.]+$/, '') || `單品 ${i + 1}`,
+                        color: '經典色',
+                        price: '',
+                        care: '裝洗衣袋柔洗 · 禁高溫烘乾',
+                        notes: '',
+                        aiStatus: resolveApiKey() ? 'queued' : 'manual'
+                    });
+                } catch (err) {
+                    showToast(`已略過非圖片檔案：${files[i].name}`, 'error');
+                }
+            }
+
+            renderBatchDraftList();
+            if (saveBtn) saveBtn.disabled = batchDrafts.length === 0;
+
+            // 階段二：若有 API Key，啟動排隊佇列逐件呼叫 AI 偵測品項
+            if (resolveApiKey() && batchDrafts.length > 0) {
+                let doneCount = 0;
+                const total = batchDrafts.length;
+
+                for (let idx = 0; idx < total; idx++) {
+                    if (batchAiAbort) break;
+                    const draft = batchDrafts[idx];
+                    draft.aiStatus = 'detecting';
+                    renderBatchDraftList();
+                    setText('batch-progress-text', `✨ 排隊 AI 辨識中：第 ${idx + 1} / ${total} 件（避免 API 擁塞）...`);
+                    if (barEl) barEl.style.width = `${30 + Math.round(((idx + 1) / total) * 70)}%`;
+
+                    try {
+                        const detected = await detectGarmentDetailsFromBlobs(draft.frontBlob, draft.backBlob);
+                        if (detected && detected.name) {
+                            draft.category = detected.category;
+                            draft.name = detected.name;
+                            draft.color = detected.color;
+                            draft.care = detected.care;
+                            draft.notes = detected.notes;
+                            draft.aiStatus = 'done';
+                            doneCount++;
+                        } else {
+                            draft.aiStatus = 'failed';
+                        }
+                    } catch (err) {
+                        draft.aiStatus = 'failed';
+                        if (/not found|API key|403|400/i.test(err.message || '')) {
+                            showToast(`AI 辨識已停止：${err.message}`, 'error');
+                            break;
+                        }
+                    }
+                    renderBatchDraftList();
+
+                    if (idx < total - 1 && !batchAiAbort) {
+                        await new Promise(r => setTimeout(r, 650));
+                    }
+                }
+                setText('batch-progress-text', `✅ 排隊辨識結束（成功 ${doneCount} / ${total} 件），確認後點擊「全部收入 UltraDB 衣櫥」`);
+            } else {
+                if (barEl) barEl.style.width = '100%';
+                setText('batch-progress-text', `✅ 已完成 ${batchDrafts.length} 張圖片壓縮（未設定 API 金鑰，可先收入衣櫥後再一鍵 AI 辨識）`);
+            }
+        }
+
+        function renderBatchDraftList() {
+            const box = getEl('batch-list-container');
+            if (!box) return;
+            box.innerHTML = batchDrafts.map((d, idx) => {
+                const opts = Object.entries(CATEGORY_META).map(([k, v]) =>
+                    `<option value="${k}" ${d.category === k ? 'selected' : ''}>${v.label}</option>`
+                ).join('');
+                const statusBadge = d.aiStatus === 'detecting'
+                    ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">⏳ 辨識中</span>'
+                    : d.aiStatus === 'done'
+                        ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">✅ 已辨識</span>'
+                        : d.aiStatus === 'queued'
+                            ? '<span class="text-[10px] px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600">排隊中</span>'
+                            : '';
+
+                return `
+                    <div class="p-3 rounded-xl bg-editorialBg border border-editorialBorder flex items-center gap-3">
+                        <img src="${d.frontPreviewUrl}" alt="預覽" class="w-14 h-14 rounded-xl object-cover border border-editorialBorder shrink-0">
+                        <div class="flex-1 space-y-1.5">
+                            <div class="flex items-center justify-between">
+                                ${statusBadge}
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                                <select onchange="updateBatchDraftField(${idx}, 'category', this.value)" class="rounded-lg bg-editorialCard border border-editorialBorder px-2 py-1.5 text-xs font-semibold">${opts}</select>
+                                <input type="text" value="${escapeHtml(d.name)}" onchange="updateBatchDraftField(${idx}, 'name', this.value)" placeholder="單品名稱" class="sm:col-span-2 rounded-lg bg-editorialCard border border-editorialBorder px-2.5 py-1.5 text-xs font-medium">
+                                <input type="number" min="0" value="${escapeHtml(d.price)}" onchange="updateBatchDraftField(${idx}, 'price', this.value)" placeholder="價格選填" class="rounded-lg bg-editorialCard border border-editorialBorder px-2.5 py-1.5 text-xs">
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-1 shrink-0">
+                            <label class="text-[10px] font-semibold text-editorialAccent cursor-pointer hover:underline">
+                                ${d.backBlob ? '✅ 已附背面' : '+ 背面照'}
+                                <input type="file" accept="image/*" class="hidden" onchange="attachBatchDraftBack(event, ${idx})">
+                            </label>
+                            <button type="button" onclick="removeBatchDraftItem(${idx})" class="text-xs text-editorialMuted hover:text-rose-600 px-1">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function attachBatchDraftBack(event, idx) {
+            const file = event.target?.files?.[0];
+            if (!file || !batchDrafts[idx]) return;
+            try {
+                batchDrafts[idx].backBlob = await compressImageToBlob(file, 640, 0.78);
+                renderBatchDraftList();
+            } catch (e) {
+                showToast('背面照讀取失敗。', 'error');
+            }
+        }
+
+        function updateBatchDraftField(idx, key, val) {
+            if (batchDrafts[idx]) batchDrafts[idx][key] = val;
+        }
+
+        function removeBatchDraftItem(idx) {
+            batchDrafts.splice(idx, 1);
+            renderBatchDraftList();
+            const saveBtn = getEl('btn-commit-batch');
+            if (saveBtn) saveBtn.disabled = batchDrafts.length === 0;
+        }
+
+        async function commitBatchDrafts() {
+            if (batchDrafts.length === 0) return;
+            const addedMeta = [];
+            for (let i = 0; i < batchDrafts.length; i++) {
+                const d = batchDrafts[i];
+                const cat = d.category || 'top';
+                const p = (d.price !== '' && !isNaN(Number(d.price)) && Number(d.price) > 0) ? Number(d.price) : null;
+                const id = 'w_' + Date.now() + '_' + i + '_' + Math.random().toString(36).slice(2, 5);
+
+                if (d.frontBlob) await putImageBlob(`front_${id}`, d.frontBlob);
+                if (d.backBlob) await putImageBlob(`back_${id}`, d.backBlob);
+
+                addedMeta.push({
+                    id,
+                    category: cat,
+                    name: (d.name || '未命名單品').trim(),
+                    color: (d.color || '經典色').trim(),
+                    price: p,
+                    washThreshold: CATEGORY_META[cat]?.defaultThreshold || 2,
+                    care: d.care || CATEGORY_META[cat]?.defaultCare || '一般機洗',
+                    notes: d.notes || '',
+                    hasFront: Boolean(d.frontBlob),
+                    hasBack: Boolean(d.backBlob),
+                    aiDetected: d.aiStatus === 'done',
+                    wearCount: 0,
+                    wearsSinceWash: 0,
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            appState.wardrobe = [...addedMeta, ...appState.wardrobe];
+            await saveMetaState();
+            renderWardrobeSection();
+            batchDrafts = [];
+            if (getEl('batch-files-input')) getEl('batch-files-input').value = '';
+            closeModal('batch-modal');
+            showToast(`✅ 已成功批次匯入 ${addedMeta.length} 件單品至 UltraDB 二進位圖庫！`);
+        }
+
+        // =====================================================================
+        // 8. 分頁 3：7 槽位造型工坊 & 白褲防透色警報 & 週曆
+        // =====================================================================
+        function renderStudioSlots() {
+            const grid = getEl('studio-slots-grid');
+            if (!grid) return;
+
+            grid.innerHTML = STUDIO_SLOTS.map(slot => {
+                const label = CATEGORY_META[slot]?.label || slot;
+                const selectedId = studioSlotIds[slot];
+                const selectedItem = selectedId ? appState.wardrobe.find(w => w.id === selectedId) : null;
+                const imgUrl = selectedItem ? getDisplayImageUrl(`front_${selectedItem.id}`) : '';
+                const options = appState.wardrobe
+                    .filter(w => w.category === slot)
+                    .map(w => `<option value="${w.id}" ${w.id === selectedId ? 'selected' : ''}>${escapeHtml(w.name)} (${escapeHtml(w.color)})</option>`)
+                    .join('');
+
+                return `
+                    <div class="p-3 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-editorialText">${label}</span>
+                            ${selectedItem ? `<button type="button" onclick="setStudioSlotItem('${slot}', null)" class="text-[10px] text-rose-600 hover:underline">移除</button>` : ''}
+                        </div>
+                        <div class="h-24 rounded-xl bg-editorialCard border border-editorialBorder flex items-center justify-center overflow-hidden">
+                            ${imgUrl
+                                ? `<img src="${imgUrl}" alt="${escapeHtml(selectedItem.name)}" class="w-full h-full object-cover">`
+                                : `<span class="text-[11px] text-editorialMuted">尚未選取</span>`}
+                        </div>
+                        <select onchange="setStudioSlotItem('${slot}', this.value)" class="w-full rounded-lg bg-editorialCard border border-editorialBorder px-2 py-1.5 text-[11px] font-medium">
+                            <option value="">-- 選擇${label} --</option>
+                            ${options}
+                        </select>
+                    </div>
+                `;
+            }).join('');
+
+            checkWhitePantsTransparencyRule();
+        }
+
+        function setStudioSlotItem(slot, itemId) {
+            studioSlotIds[slot] = itemId || null;
+            renderStudioSlots();
+        }
+
+        function clearStudioSlots() {
+            STUDIO_SLOTS.forEach(s => { studioSlotIds[s] = null; });
+            renderStudioSlots();
+        }
+
+        function checkWhitePantsTransparencyRule() {
+            const bottomItem = studioSlotIds.bottom ? appState.wardrobe.find(w => w.id === studioSlotIds.bottom) : null;
+            const uwItem = studioSlotIds.underwear ? appState.wardrobe.find(w => w.id === studioSlotIds.underwear) : null;
+
+            const isWhiteOrLightBottom = bottomItem && /白|米|淺|cream|white/i.test(`${bottomItem.name} ${bottomItem.color}`);
+            const isDarkOrPatternUw = uwItem && /黑|深|紅|藍|紫|花|條紋|black|dark|navy/i.test(`${uwItem.name} ${uwItem.color}`);
+
+            if (isWhiteOrLightBottom && isDarkOrPatternUw) {
+                setText('underwear-alert-msg', `偵測到「${bottomItem.name}」搭配了「${uwItem.name}（${uwItem.color}）」，強光下容易透出顏色與邊界！建議改選衣櫥裡的淺灰、膚色或純白內褲。`);
+                showEl('underwear-transparency-alert');
+            } else {
+                hideEl('underwear-transparency-alert');
+            }
+        }
+
+        function aiAutoFillStudio() {
+            if (appState.wardrobe.length === 0) {
+                showToast('衣櫥目前還是 0 件喔，先去「我的數位衣櫥」上傳幾件衣服吧！', 'error');
+                return;
+            }
+            STUDIO_SLOTS.forEach(slot => {
+                const candidates = appState.wardrobe.filter(w => w.category === slot);
+                if (candidates.length === 0) {
+                    studioSlotIds[slot] = null;
+                    return;
+                }
+                if (slot === 'underwear' && studioSlotIds.bottom) {
+                    const b = appState.wardrobe.find(w => w.id === studioSlotIds.bottom);
+                    if (b && /白|米|淺/i.test(`${b.name} ${b.color}`)) {
+                        const safe = candidates.filter(u => !/黑|深|紅|藍|紫/i.test(`${u.name} ${u.color}`));
+                        if (safe.length > 0) {
+                            studioSlotIds[slot] = safe[Math.floor(Math.random() * safe.length)].id;
+                            return;
+                        }
+                    }
+                }
+                studioSlotIds[slot] = candidates[Math.floor(Math.random() * candidates.length)].id;
+            });
+            renderStudioSlots();
+            showToast('✨ 已從您的數位衣櫥智慧抓取一組造型！');
+        }
+
+        async function saveCurrentStudioOutfit() {
+            const ids = STUDIO_SLOTS.map(s => studioSlotIds[s]).filter(Boolean);
+            if (ids.length < 2) {
+                showToast('請至少放入 2 件單品再儲存造型！', 'error');
+                return;
+            }
+            const names = ids.map(id => appState.wardrobe.find(w => w.id === id)?.name).filter(Boolean);
+            appState.outfits.unshift({
+                id: 'outfit_' + Date.now(),
+                title: names.slice(0, 2).join(' ＋ ') + (names.length > 2 ? ` 等 ${names.length} 件` : ''),
+                itemIds: ids
+            });
+            await saveMetaState();
+            renderSavedOutfits();
+            renderWeeklyPlan();
+            showToast('造型已儲存！可排入右側一週 OOTD 日曆。');
+        }
+
+        async function checkInCurrentOutfitToday() {
+            const ids = STUDIO_SLOTS.map(s => studioSlotIds[s]).filter(Boolean);
+            if (ids.length === 0) {
+                showToast('畫布上還沒有單品，先挑選幾件單品再打卡喔！', 'error');
+                return;
+            }
+            const names = [];
+            ids.forEach(id => {
+                const item = appState.wardrobe.find(w => w.id === id);
+                if (item) {
+                    item.wearCount = (item.wearCount || 0) + 1;
+                    item.wearsSinceWash = (item.wearsSinceWash || 0) + 1;
+                    names.push(item.name);
+                }
+            });
+
+            const todayLabel = new Date().toLocaleDateString('zh-TW', { month: 'numeric', day: 'numeric', weekday: 'short' });
+            appState.wearLogs.unshift({
+                id: 'log_' + Date.now(),
+                date: todayLabel,
+                items: names
+            });
+
+            await saveMetaState();
+            refreshWardrobeStatsAndAnalytics();
+            renderOotdHistoryLog();
+            showToast(`✅ 今日穿搭打卡成功！已為整套 ${names.length} 件單品自動累計穿著 +1 次。`);
+        }
+
+        function applySavedOutfitToStudio(outfitId) {
+            const outfit = appState.outfits.find(o => o.id === outfitId);
+            if (!outfit) return;
+            clearStudioSlots();
+            (outfit.itemIds || []).forEach(id => {
+                const item = appState.wardrobe.find(w => w.id === id);
+                if (item && STUDIO_SLOTS.includes(item.category)) {
+                    studioSlotIds[item.category] = item.id;
+                }
+            });
+            renderStudioSlots();
+            showToast(`已載入造型：「${outfit.title}」`);
+        }
+
+        async function deleteSavedOutfit(outfitId) {
+            appState.outfits = appState.outfits.filter(o => o.id !== outfitId);
+            WEEK_DAYS.forEach(d => {
+                if (appState.weeklyPlan[d] === outfitId) delete appState.weeklyPlan[d];
+            });
+            await saveMetaState();
+            renderSavedOutfits();
+            renderWeeklyPlan();
+        }
+
+        function renderSavedOutfits() {
+            const box = getEl('saved-outfits-list');
+            setText('saved-outfits-count', `${appState.outfits.length} 套`);
+            if (!box) return;
+            if (appState.outfits.length === 0) {
+                box.innerHTML = `<div class="col-span-full text-xs text-editorialMuted py-2">尚未儲存造型，在上方挑選單品後點擊「儲存至造型庫」。</div>`;
+                return;
+            }
+            box.innerHTML = appState.outfits.map(o => `
+                <div class="p-3 rounded-xl bg-editorialBg border border-editorialBorder flex items-center justify-between gap-2">
+                    <span class="text-xs font-bold text-editorialText line-clamp-1">${escapeHtml(o.title)}</span>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <button type="button" onclick="applySavedOutfitToStudio('${o.id}')" class="px-2 py-1 rounded-lg bg-editorialCard border border-editorialBorder text-[10px] font-bold">套用</button>
+                        <button type="button" onclick="deleteSavedOutfit('${o.id}')" class="px-2 py-1 rounded-lg text-[10px] text-rose-600 hover:bg-rose-50">刪</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function assignWeekDayOutfit(day, outfitId) {
+            if (!outfitId) delete appState.weeklyPlan[day];
+            else appState.weeklyPlan[day] = outfitId;
+            await saveMetaState();
+            renderWeeklyPlan();
+        }
+
+        async function aiFillNonDuplicateWeek() {
+            if (appState.outfits.length === 0) {
+                showToast('請先在左側儲存至少 1～2 套造型，再一鍵排入一週日曆！', 'error');
+                return;
+            }
+            let lastId = null;
+            WEEK_DAYS.forEach((day, idx) => {
+                const pool = appState.outfits.filter(o => o.id !== lastId);
+                const chosen = pool.length > 0 ? pool[idx % pool.length] : appState.outfits[0];
+                appState.weeklyPlan[day] = chosen.id;
+                lastId = chosen.id;
+            });
+            await saveMetaState();
+            renderWeeklyPlan();
+            showToast('✨ 已為您自動排滿一週不重複穿搭日曆！');
+        }
+
+        function renderWeeklyPlan() {
+            const list = getEl('weekly-plan-list');
+            if (!list) return;
+
+            let dupWarning = '';
+
+            list.innerHTML = WEEK_DAYS.map((day, idx) => {
+                const assignedId = appState.weeklyPlan[day] || '';
+                if (idx > 0 && assignedId && assignedId === appState.weeklyPlan[WEEK_DAYS[idx - 1]]) {
+                    dupWarning = `⚠️ 偵測到「${WEEK_DAYS[idx - 1]}」與「${day}」排了同一套造型，建議錯開維持新鮮感！`;
+                }
+                return `
+                    <div class="p-2.5 rounded-xl bg-editorialBg border border-editorialBorder flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-editorialText w-10 shrink-0">${day}</span>
+                        <select onchange="assignWeekDayOutfit('${day}', this.value)" class="flex-1 rounded-lg bg-editorialCard border border-editorialBorder px-2.5 py-1.5 text-xs">
+                            <option value="">-- 尚未排程 --</option>
+                            ${appState.outfits.map(o => `<option value="${o.id}" ${o.id === assignedId ? 'selected' : ''}>${escapeHtml(o.title)}</option>`).join('')}
+                        </select>
+                    </div>
+                `;
+            }).join('');
+
+            if (dupWarning) {
+                setText('weekly-duplicate-warning', dupWarning);
+                showEl('weekly-duplicate-warning');
+            } else {
+                hideEl('weekly-duplicate-warning');
+            }
+        }
+
+        function renderOotdHistoryLog() {
+            const box = getEl('ootd-history-list');
+            setText('history-log-count', `${appState.wearLogs.length} 筆紀錄`);
+            if (!box) return;
+            if (appState.wearLogs.length === 0) {
+                box.innerHTML = `<div class="text-xs text-editorialMuted py-2">尚未有打卡紀錄，搭配好造型後點擊「今日就穿這套打卡」即可自動累計。</div>`;
+                return;
+            }
+            box.innerHTML = appState.wearLogs.map(log => `
+                <div class="p-2.5 rounded-xl bg-editorialBg border border-editorialBorder text-xs">
+                    <div class="font-bold text-editorialAccent">${escapeHtml(log.date)}</div>
+                    <div class="text-editorialText mt-0.5">${escapeHtml((log.items || []).join(' ＋ '))}</div>
+                </div>
+            `).join('');
+        }
+
+        // =====================================================================
+        // 9. 分頁 4：實拍診斷 · Buy or Bye 滅火器 · 旅行膠囊打包
+        // =====================================================================
+        function setDiagPhotoMode(mode) {
+            diagPhotoMode = mode;
+            const wornBtn = getEl('btn-diag-mode-worn');
+            const flatBtn = getEl('btn-diag-mode-flat');
+            if (wornBtn && flatBtn) {
+                wornBtn.className = mode === 'worn'
+                    ? 'py-2 rounded-lg text-xs font-bold bg-editorialText text-white transition'
+                    : 'py-2 rounded-lg text-xs font-medium text-editorialText hover:bg-editorialSand transition';
+                flatBtn.className = mode === 'flat'
+                    ? 'py-2 rounded-lg text-xs font-bold bg-editorialText text-white transition'
+                    : 'py-2 rounded-lg text-xs font-medium text-editorialText hover:bg-editorialSand transition';
+            }
+        }
+
+        function handleDiagPhotoUpload(event) {
+            const file = event.target?.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                diagPhotoDataUrl = ev.target.result;
+                const img = getEl('diag-photo-preview');
+                if (img) { img.src = diagPhotoDataUrl; img.classList.remove('hidden'); }
+                hideEl('diag-photo-placeholder');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function runPhotoDiagnosis() {
+            if (!diagPhotoDataUrl) {
+                showToast('請先上傳穿搭實拍或平拍單品組合照喔！', 'error');
+                return;
+            }
+            const ctx = (getEl('diag-context-input')?.value || '').trim();
+            const btn = getEl('btn-run-diag');
+            if (btn) { btn.disabled = true; btn.textContent = '🔍 正在結合時裝週與博主趨勢分析...'; }
+
+            const modeText = diagPhotoMode === 'worn' ? '實穿上身照' : '平拍/掛拍單品組合照（請執行虛擬上身比例推演）';
+            let aiRes = null;
+            if (resolveApiKey()) {
+                try {
+                    aiRes = await callGeminiAPI(
+                        `你是結合四大時裝週剪裁比例與全球穿搭博主經驗的個人造型總監。使用者檔案：${JSON.stringify(appState.profile)}。照片模式：${modeText}。補充說明：「${ctx}」。請回傳繁體中文 JSON：{"score":"88 / 100","verdict":"一句話總評","proportion":"身形比例與虛擬上身推演（169cm視角）","runwayTrend":"秀場與穿搭博主風格解析","tweak":"最關鍵的30秒微調建議"}`,
+                        [diagPhotoDataUrl]
+                    );
+                } catch (e) {}
+            }
+
+            const box = getEl('diag-result-box');
+            if (box) {
+                if (aiRes && aiRes.verdict) {
+                    box.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-editorialBorder pb-2">
+                            <span class="font-bold text-editorialText">${escapeHtml(aiRes.verdict)}</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-editorialText text-white font-bold">${escapeHtml(aiRes.score || '86 / 100')}</span>
+                        </div>
+                        <p><strong>📐 比例與上身推演：</strong>${escapeHtml(aiRes.proportion)}</p>
+                        <p><strong>🏛️ 秀場與博主趨勢：</strong>${escapeHtml(aiRes.runwayTrend)}</p>
+                        <p class="text-editorialAccent font-semibold"><strong>⚡ 30 秒微調關鍵：</strong>${escapeHtml(aiRes.tweak)}</p>
+                    `;
+                } else {
+                    box.innerHTML = `
+                        <div class="flex items-center justify-between border-b border-editorialBorder pb-2">
+                            <span class="font-bold text-editorialText">${diagPhotoMode === 'flat' ? '平拍組合比例協調，具備街頭辨識度' : '整體單品呼應完整，微調領口與褲長更修長'}</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-editorialText text-white font-bold">86 / 100</span>
+                        </div>
+                        <p><strong>📐 比例與上身推演：</strong>針對 ${appState.profile.height}cm 身形，上下身色塊分割明確；建議褲腳保持微蓋鞋舌，避免在腳踝堆疊。</p>
+                        <p><strong>🏛️ 秀場與博主趨勢：</strong>符合近年時裝週街拍常見的「運動球衣/重磅廓形 × 休閒丹寧或寬褲」高對比混搭邏輯。</p>
+                        <p class="text-editorialAccent font-semibold"><strong>⚡ 30 秒微調關鍵：</strong>若搭配厚重外套請將拉鍊拉低至胸口並外翻領片，露出內搭層次與頸部線條。</p>
+                    `;
+                }
+                showEl('diag-result-box');
+            }
+            if (btn) { btn.disabled = false; btn.textContent = '✨ 開始深度造型診斷與比例推演'; }
+        }
+
+        function handleBobPhotoUpload(event) {
+            const file = event.target?.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => {
+                bobPhotoDataUrl = ev.target.result;
+                const img = getEl('bob-photo-preview');
+                if (img) { img.src = bobPhotoDataUrl; img.classList.remove('hidden'); }
+                hideEl('bob-photo-placeholder');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function runBuyOrByeAnalysis() {
+            const itemName = (getEl('bob-name-input')?.value || '').trim();
+            const price = (getEl('bob-price-input')?.value || '').trim();
+            if (!itemName && !bobPhotoDataUrl) {
+                showToast('請輸入欲購買的單品名稱或上傳截圖喔！', 'error');
+                return;
+            }
+            const btn = getEl('btn-run-bob');
+            if (btn) { btn.disabled = true; btn.textContent = '⚖️ 正在比對現有衣櫥可搭配套數...'; }
+
+            const wardrobeText = appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、');
+            let aiRes = null;
+            if (resolveApiKey()) {
+                try {
+                    aiRes = await callGeminiAPI(
+                        `你是誠實幫使用者守住荷包的穿搭顧問。使用者現有衣櫥：${wardrobeText || '尚未建檔'}。欲購買單品：「${itemName || '截圖單品'}」，價格：${price || '未標'}。請評估能與現有衣櫥配出幾套造型、是否重複購買，並回傳繁體中文 JSON：{"verdict":"BUY 值得入手 或 BYE 建議滅火","combosCount":3,"reason":"誠實分析與衣櫥現有單品搭配公式"}`,
+                        bobPhotoDataUrl ? [bobPhotoDataUrl] : []
+                    );
+                } catch (e) {}
+            }
+
+            const box = getEl('bob-result-box');
+            if (box) {
+                if (aiRes && aiRes.verdict) {
+                    const isBuy = /buy|值得/i.test(aiRes.verdict);
+                    box.innerHTML = `
+                        <div class="inline-block px-2.5 py-1 rounded-lg font-bold ${isBuy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">${escapeHtml(aiRes.verdict)}（預計可配 ${aiRes.combosCount || 2} 套）</div>
+                        <p class="text-editorialText mt-1.5">${escapeHtml(aiRes.reason)}</p>
+                    `;
+                } else {
+                    const hasEnoughWardrobe = appState.wardrobe.length >= 2;
+                    box.innerHTML = `
+                        <div class="inline-block px-2.5 py-1 rounded-lg font-bold ${hasEnoughWardrobe ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'}">${hasEnoughWardrobe ? 'BUY · 具備一衣多穿潛力' : '冷靜評估 · 建議先比對現有下身'}</div>
+                        <p class="text-editorialText mt-1.5">針對「${escapeHtml(itemName || '此欲購單品')}」：購買前請確認它能否直接搭配你衣櫥裡最常穿的<strong>白色直筒牛仔褲</strong>或<strong>深色寬褲</strong>，若無法無痛配出 3 套以上不重複出門造型，建議先放入冷靜期 48 小時省荷包！</p>
+                    `;
+                }
+                showEl('bob-result-box');
+            }
+            if (btn) { btn.disabled = false; btn.textContent = '⚖️ 比對現有衣櫥：該買（BUY）還是滅火（BYE）？'; }
+        }
+
+        function generateCapsulePackingList() {
+            const dest = (getEl('pack-dest-input')?.value || '').trim() || '週末輕旅行';
+            const days = Math.max(1, parseInt(getEl('pack-days-input')?.value, 10) || 3);
+            const topsNeeded = Math.min(days, Math.ceil(days * 0.8));
+            const bottomsNeeded = Math.max(1, Math.ceil(days / 2));
+            const underwearNeeded = days + 1;
+            const socksNeeded = days + 1;
+
+            const myTops = appState.wardrobe.filter(w => w.category === 'top').slice(0, topsNeeded).map(w => w.name);
+            const myBottoms = appState.wardrobe.filter(w => w.category === 'bottom').slice(0, bottomsNeeded).map(w => w.name);
+            const myOuter = appState.wardrobe.filter(w => w.category === 'outerwear').slice(0, 1).map(w => w.name);
+            const myShoes = appState.wardrobe.filter(w => w.category === 'shoes').slice(0, 1).map(w => w.name);
+
+            const box = getEl('pack-result-box');
+            if (box) {
+                box.innerHTML = `
+                    <div class="font-bold text-editorialText">🎒 【${escapeHtml(dest)} · ${days} 天】一衣多穿膠囊清單</div>
+                    <ul class="list-disc list-inside space-y-1 text-editorialText mt-1">
+                        <li><strong>上衣（${topsNeeded} 件）：</strong>${myTops.length > 0 ? escapeHtml(myTops.join('、')) : '透氣球衣 / 寬版短 T 輪替'}</li>
+                        <li><strong>下身（${bottomsNeeded} 件）：</strong>${myBottoms.length > 0 ? escapeHtml(myBottoms.join('、')) : '白色直筒牛仔褲 ＋ 深色百搭寬褲'}</li>
+                        <li><strong>外套（1 件）：</strong>${myOuter.length > 0 ? escapeHtml(myOuter[0]) : '防風/重磅連帽外套（應對室內冷氣與早晚溫差）'}</li>
+                        <li><strong>鞋款（1 雙）：</strong>${myShoes.length > 0 ? escapeHtml(myShoes[0]) : '最耐走的復古球鞋'}</li>
+                        <li class="text-editorialAccent font-bold"><strong>貼身備品（自動 +1 備用）：</strong>內褲 ${underwearNeeded} 件（若帶白褲請優先選淺灰/純白款）、襪子 ${socksNeeded} 雙</li>
+                    </ul>
+                `;
+                showEl('pack-result-box');
+            }
+        }
+
+        // =====================================================================
+        // 10. 啟動初始化
+        // =====================================================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            const supInput = getEl('global-supplement-back-input');
+            if (supInput) supInput.addEventListener('change', onSupplementBackChosen);
+
+            const impInput = getEl('global-import-json-input');
+            if (impInput) impInput.addEventListener('change', handleImportBackupFile);
+
+            await loadAllFromUltraDB();
+            await migrateLegacyStoresIfNeeded();
+
+            refreshProfileBadge();
+            updateTempBadge();
+            renderWardrobeSection();
+            renderStudioSlots();
+            renderSavedOutfits();
+            renderWeeklyPlan();
+            renderOotdHistoryLog();
+        });
+    </script>
+</body>
+</html>
