@@ -905,7 +905,7 @@
             </div>
             <div class="p-4 sm:p-5 space-y-3">
                 <p class="text-xs text-editorialMuted leading-relaxed">
-                    填入 Google AI Studio 申請的 Gemini API Key（目前使用穩定版 <code>gemini-2.5-flash</code> 模型），即可啟用雲端視覺自動辨識衣服品項、顏色與穿搭診斷。
+                    填入 Google AI Studio 申請的 Gemini API Key（目前使用穩定版 <code>gemini-3.8-flash</code> 模型），即可啟用雲端視覺自動辨識衣服品項、顏色與穿搭診斷。
                 </p>
                 <input type="password" id="apikey-input" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-sm">
             </div>
@@ -1393,7 +1393,7 @@
             }
 const savedKey = Object.values(localStorage).find(v => typeof v === 'string' && (v.trim().startsWith('AIza') || v.trim().startsWith('AQ.')));
 const finalKey = savedKey ? savedKey.trim() : apiKey;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent`;
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 try {
                     const res = await fetch(url, {
