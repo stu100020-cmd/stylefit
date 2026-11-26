@@ -1391,7 +1391,8 @@
                     }
                 });
             }
-
+const savedKey = Object.values(localStorage).find(v => typeof v === 'string' && (v.trim().startsWith('AIza') || v.trim().startsWith('AQ.')));
+if (savedKey) apiKey = savedKey.trim();
             const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`;
             for (let attempt = 0; attempt <= maxRetries; attempt++) {
                 try {
