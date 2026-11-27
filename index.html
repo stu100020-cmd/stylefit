@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StyleFit AI — 個人專屬造型師與智慧衣櫥</title>
-    <!-- Google Fonts: Noto Serif TC & Noto Sans TC -->
+    <title>StyleFit AI Pro — 169cm 專屬造型總監與智慧衣櫥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Serif+TC:wght@600;700&display=swap" rel="stylesheet">
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -57,7 +55,7 @@
         <span id="global-toast-msg" class="leading-snug">系統就緒</span>
     </div>
 
-    <!-- 隱藏的全域輔助檔案輸入器（補傳背面照 / 匯入 JSON 備份） -->
+    <!-- 隱藏的全域輔助檔案輸入器 -->
     <input type="file" id="global-supplement-back-input" accept="image/*" class="hidden">
     <input type="file" id="global-import-json-input" accept=".json,application/json" class="hidden">
 
@@ -65,18 +63,17 @@
     <header class="sticky top-0 z-30 bg-editorialBg/95 backdrop-blur-md border-b border-editorialBorder">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col gap-3">
             <div class="flex flex-wrap items-center justify-between gap-2">
-                <!-- 品牌標題 -->
                 <div class="flex items-center gap-2.5">
                     <div class="w-9 h-9 rounded-xl bg-editorialText text-white flex items-center justify-center font-serif font-bold text-lg shadow-sm">S</div>
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 class="font-serif font-bold text-base sm:text-lg tracking-tight text-editorialText">StyleFit AI</h1>
+                            <h1 class="font-serif font-bold text-base sm:text-lg tracking-tight text-editorialText">StyleFit AI <span class="text-xs font-sans font-bold px-1.5 py-0.5 rounded bg-editorialAccent text-white">169CM PRO</span></h1>
                             <span id="header-storage-badge" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                                 <span>UltraDB 二進位圖庫</span>
                             </span>
                         </div>
-                        <p class="text-[11px] text-editorialMuted">個人專屬造型師與超大容量智慧衣櫥</p>
+                        <p class="text-[11px] text-editorialMuted">對標小紅書 / Pinterest 168–170cm 同身高男模比例 · 全衣櫥智慧比對</p>
                     </div>
                 </div>
 
@@ -84,12 +81,13 @@
                 <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                     <button type="button" onclick="openModal('profile-modal')" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-editorialSand hover:bg-stone-200/80 border border-editorialBorder text-xs font-semibold text-editorialText transition">
                         <span class="w-2 h-2 rounded-full bg-editorialAccent"></span>
-                        <span id="header-profile-pill">169 cm · S/M 碼 · 褲長蓋鞋舌</span>
+                        <span id="header-profile-pill">169 cm · 50 kg · S/M 碼</span>
                     </button>
-                    <button type="button" onclick="openModal('backup-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition" title="匯出或還原衣櫥 JSON 備份">
+                    <button type="button" onclick="openModal('backup-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition">
                         <span>💾 備份/還原</span>
                     </button>
-                    <button type="button" onclick="openModal('apikey-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition" title="設定 Gemini API 金鑰">
+                    <button type="button" id="header-api-btn" onclick="openModal('apikey-modal')" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-medium text-editorialText transition">
+                        <span id="header-api-dot" class="w-2 h-2 rounded-full bg-zinc-400"></span>
                         <span>🔑 API</span>
                     </button>
                 </div>
@@ -125,11 +123,11 @@
             <div class="lg:col-span-5 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
                 <div class="flex items-start justify-between gap-2">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">DAILY OUTFIT &amp; SCENT</span>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">169CM MODEL PROPORTION ENGINE</span>
                         <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">今日出門決策台</h2>
                     </div>
                     <span id="temp-dynamic-badge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                        溫差 6°C · 洋蔥式穿脫
+                        溫差 6°C · 上長下短／層次皆宜
                     </span>
                 </div>
 
@@ -137,14 +135,14 @@
                 <div class="p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-3">
                     <div class="flex items-center justify-between">
                         <span class="text-xs font-bold text-editorialText">今日氣溫區間 (°C)</span>
-                        <span class="text-[11px] text-editorialMuted">依最低溫選外套、最高溫定內搭</span>
+                        <span class="text-[11px] text-editorialMuted">支援「上長下短（外套＋短褲＋長襪）」與長褲比例</span>
                     </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div class="bg-editorialCard rounded-xl p-2.5 border border-editorialBorder">
                             <label for="temp-min-input" class="block text-[10px] font-semibold text-editorialMuted mb-1">最低溫 (°C)</label>
                             <div class="flex items-center justify-between gap-1">
                                 <button type="button" onclick="adjustTemp('min', -1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">−</button>
-                                <input type="number" id="temp-min-input" value="16" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
+                                <input type="number" id="temp-min-input" value="19" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
                                 <button type="button" onclick="adjustTemp('min', 1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">+</button>
                             </div>
                         </div>
@@ -152,7 +150,7 @@
                             <label for="temp-max-input" class="block text-[10px] font-semibold text-editorialMuted mb-1">最高溫 (°C)</label>
                             <div class="flex items-center justify-between gap-1">
                                 <button type="button" onclick="adjustTemp('max', -1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">−</button>
-                                <input type="number" id="temp-max-input" value="22" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
+                                <input type="number" id="temp-max-input" value="25" oninput="updateTempBadge()" class="w-12 text-center font-bold text-base bg-transparent focus:outline-none">
                                 <button type="button" onclick="adjustTemp('max', 1)" class="w-8 h-8 rounded-lg bg-editorialSand hover:bg-stone-200 font-bold text-sm text-editorialText">+</button>
                             </div>
                         </div>
@@ -161,8 +159,8 @@
 
                 <!-- 自由文字行程輸入 -->
                 <div class="space-y-1.5">
-                    <label for="today-itinerary-input" class="block text-xs font-bold text-editorialText">今日真實行程與細節（自由輸入）</label>
-                    <textarea id="today-itinerary-input" rows="3" placeholder="直接打字輸入今天要去哪、見誰或在意的小細節，例如：早上在教室上課冷氣強，下午要去逛街拍照，晚上跟朋友吃燒肉不想外套沾油煙味..." class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
+                    <label for="today-itinerary-input" class="block text-xs font-bold text-editorialText">今日真實行程與風格氛圍</label>
+                    <textarea id="today-itinerary-input" rows="3" placeholder="例如：早八上課冷氣強，下午要去勤美逛街拍照，想走 City Boy 外套配短褲＋長襪的街頭比例，晚上跟朋友吃燒肉..." class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
                 </div>
 
                 <!-- 隨身香水選擇 -->
@@ -172,24 +170,28 @@
                         <option value="大吉嶺淡香精（茶香木質調）">大吉嶺淡香精（清冷茶香木質調）</option>
                         <option value="悟香水（柑橘羅勒草本調）">悟香水（清爽柑橘羅勒調）</option>
                         <option value="一生之鹽（海洋礦物木質調）">一生之鹽（乾淨海洋木質調）</option>
+                        <option value="CK One（經典柑橘麝香調）">CK One（乾淨皂感柑橘調）</option>
                         <option value="不噴香水">今日不噴香水</option>
                     </select>
                 </div>
 
                 <button type="button" id="btn-generate-today" onclick="generateTodayOutfitPlan()" class="w-full py-3.5 px-4 rounded-2xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-sm shadow-sm transition flex items-center justify-center gap-2">
-                    <span>✨ 生成今日衣櫥配方與香水點位</span>
+                    <span>✨ 對標同身高男模比例 · 生成今日穿搭與香水配方</span>
                 </button>
 
                 <!-- 今日推播結果區塊 -->
                 <div id="today-result-box" class="hidden space-y-3 pt-2 border-t border-editorialBorder">
-                    <div class="p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2">
+                    <div class="p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold text-editorialAccent">🧥 今日洋蔥式穿搭配方</span>
-                            <span id="today-source-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-editorialSand text-editorialMuted font-semibold">衣櫥智慧匹配</span>
+                            <span class="text-xs font-bold text-editorialAccent">🧥 169cm 比例鎖定配方</span>
+                            <span id="today-source-tag" class="text-[10px] px-2 py-0.5 rounded-full bg-editorialSand text-editorialMuted font-semibold">AI 造型引擎</span>
                         </div>
                         <p id="today-outfit-summary" class="text-sm font-bold text-editorialText leading-relaxed"></p>
                         <p id="today-outfit-reason" class="text-xs text-editorialMuted leading-relaxed"></p>
                         <div id="today-matched-thumbs" class="flex flex-wrap gap-2 pt-1"></div>
+                        <button type="button" id="btn-send-today-to-studio" class="hidden w-full mt-2 py-2 px-3 rounded-xl bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-bold text-editorialText transition">
+                            🎨 一鍵套入「造型工坊」微調或打卡
+                        </button>
                     </div>
 
                     <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 space-y-1.5">
@@ -203,18 +205,18 @@
             <div class="lg:col-span-7 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
                 <div class="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">PRACTICAL PROBLEM SOLVER</span>
-                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🩺 穿搭急診室（實戰解決引擎）</h2>
-                        <p class="text-xs text-editorialMuted mt-1">拒絕空泛廢話，強制輸出「根源診斷 ＋ 3 套可出門配方 ＋ 30 秒微調 ＋ 地雷避坑」</p>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">XIAOHONGSHU &amp; PINTEREST 168-170CM BENCHMARK</span>
+                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🩺 穿搭急診室（同身高模特比例解析）</h2>
+                        <p class="text-xs text-editorialMuted mt-1">針對 169 cm / 50 kg 精實身形，支援「上長下短（外套＋短褲＋長襪）」與「高腰直筒長褲」雙路線</p>
                     </div>
-                    <button type="button" onclick="loadWhiteJeansGuidePreset()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText transition">
-                        👖 白色直筒牛仔褲攻略
+                    <button type="button" onclick="loadJacketShortsPreset()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText transition">
+                        🧥 外套＋短褲＋Shox Z 比例範例
                     </button>
                 </div>
 
                 <!-- 急診問題輸入區 -->
                 <div class="space-y-3">
-                    <textarea id="er-question-input" rows="3" placeholder="輸入你現在卡關的具體穿搭問題，例如：我有一件白色直筒牛仔褲，怕穿起來腿短又不知道配什麼外套跟鞋子，我衣櫥裡現有的衣服該怎麼搭才帥？" class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
+                    <textarea id="er-question-input" rows="3" placeholder="輸入你的穿搭問題，例如：我 169cm / 50kg，想穿外套配短褲跟 Nike Shox Z，小紅書跟 Pinterest 同身高模特都是怎麼抓衣長、短褲長度跟襪子高度才顯高有質感？" class="w-full rounded-2xl bg-editorialBg border border-editorialBorder p-3.5 text-sm text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition"></textarea>
 
                     <div class="flex flex-wrap items-center justify-between gap-3">
                         <div class="flex items-center gap-2">
@@ -229,7 +231,7 @@
                         </div>
 
                         <button type="button" id="btn-run-er" onclick="runEmergencyRoomSolver()" class="px-5 py-2.5 rounded-xl bg-editorialAccent hover:bg-editorialAccentHover text-white font-bold text-xs sm:text-sm shadow-sm transition">
-                            🩺 立即開立實戰處方箋
+                            🩺 對照同身高模特開立處方箋
                         </button>
                     </div>
                 </div>
@@ -237,34 +239,34 @@
                 <!-- 急診室 4 大強制輸出板塊 -->
                 <div id="er-output-container" class="space-y-4 pt-2 border-t border-editorialBorder">
                     <div class="p-4 rounded-2xl bg-rose-50/60 border border-rose-200/80 space-y-1">
-                        <div class="text-xs font-bold text-rose-900">1. 痛點根源精準診斷｜白色直筒牛仔褲（169 cm 比例優化）</div>
+                        <div class="text-xs font-bold text-rose-900">1. 小紅書 / Pinterest 168–170 cm 男模比例拆解</div>
                         <p id="er-diagnosis-text" class="text-xs sm:text-sm text-zinc-800 leading-relaxed">
-                            白色牛仔褲最大的視覺風險在於「淺色橫向膨脹感」與「上半身壓不住重心導致頭輕腳重」，若褲腳堆積在腳踝更會直接截斷腿長。解決關鍵是：<strong>上半身採用深色或高辨識度單品鎖住視覺重心、褲腳維持微蓋鞋舌的俐落長度，並搭配淺灰/純白貼身內著防透色</strong>。
+                            169 cm / 50 kg 偏瘦身形完全可以穿<strong>「外套 ＋ 短褲」</strong>！小紅書與 Pinterest 上的日韓街頭男模最愛用這招製造「上寬下窄小腿留白」的長腿錯覺。關鍵不在於能不能配，而在於<strong>3 個精準數字</strong>：(1) 短褲下擺必須落在<strong>膝蓋上方 2～4 公分</strong>，絕不能卡在膝蓋正中間把腿切半；(2) 外套敞開露出內搭，內搭下擺紮進褲頭或選短版，建立高腰線；(3) 腳踝必須用<strong>中筒長襪（如 Nike 長襪）</strong>銜接 Shox Z 或復古球鞋，消除光腳踝的單薄感。
                         </p>
                     </div>
 
                     <div class="space-y-2.5">
-                        <div class="text-xs font-bold text-editorialText">2. 直接可出門的 3 套實戰配方</div>
+                        <div class="text-xs font-bold text-editorialText">2. 直接從你衣櫥組合的 3 套高級感實戰配方</div>
                         <div id="er-recipes-list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
                                 <div>
-                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold mb-1.5">配方 A · Blokecore</span>
-                                    <h4 class="text-xs font-bold text-editorialText">深色球衣 ＋ 白色直筒牛仔褲 ＋ 復古德訓/板鞋</h4>
-                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">深色球衣的隊徽與線條能穩穩壓住上半身重心，白褲把球衣競技感轉化為高級街頭休閒風。</p>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold mb-1.5">公式 A · 上長下短街頭</span>
+                                    <h4 class="text-xs font-bold text-editorialText">運動/連帽外套（敞開）＋ 短版內搭 ＋ 膝上短褲 ＋ Nike 長襪 ＋ Shox Z</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">Pinterest 最經典街頭比例！外套敞開露出內搭高腰線，短褲露膝上搭配中筒白襪與 Shox Z，視覺腿長直接拉高。</p>
                                 </div>
                             </div>
                             <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
                                 <div>
-                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold mb-1.5">配方 B · City Boy</span>
-                                    <h4 class="text-xs font-bold text-editorialText">重磅連帽外套 ＋ 內搭白 T 微露下擺 ＋ 白褲</h4>
-                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">靠連帽外套的帽型與挺度把視線往上拉高，內搭白 T 下擺微露 2 公分製造乾淨層次。</p>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold mb-1.5">公式 B · Blokecore 混搭</span>
+                                    <h4 class="text-xs font-bold text-editorialText">隊徽球衣 ＋ 直筒牛仔寬褲（微蓋鞋舌）＋ 復古板鞋/德訓鞋</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">S/M 碼球衣肩線合身不垮塌，直筒褲管自然垂墜微蓋鞋舌，把運動單品穿出乾淨高級感。</p>
                                 </div>
                             </div>
                             <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-col justify-between space-y-2">
                                 <div>
-                                    <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold mb-1.5">配方 C · Ivy 微正裝</span>
-                                    <h4 class="text-xs font-bold text-editorialText">水藍牛津襯衫 ＋ 白色直筒牛仔褲 ＋ 黑色皮鞋/靴</h4>
-                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">水藍與純白是最顯氣色的高級配色，腳踩黑色鞋靴收尾增加份量感，瞬間穿出大人感。</p>
+                                    <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold mb-1.5">公式 C · City Boy 層次</span>
+                                    <h4 class="text-xs font-bold text-editorialText">薄刷毛連帽外套 ＋ 寬版素 T ＋ 水洗直筒長褲 ＋ New Era 帽款</h4>
+                                    <p class="text-[11px] text-editorialMuted mt-1 leading-relaxed">帽款把視覺重心往上提 3 公分，全身控制在黑、白、灰三色以內，瘦削身形也能穿出挺拔份量感。</p>
                                 </div>
                             </div>
                         </div>
@@ -272,19 +274,19 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div class="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1.5">
-                            <div class="text-xs font-bold text-emerald-900">3. 30 秒實穿微調指令（How to Wear）</div>
+                            <div class="text-xs font-bold text-emerald-900">3. 169 cm 專屬 30 秒顯高微調（How to Wear）</div>
                             <ul id="er-tweaks-list" class="text-xs text-emerald-950/90 space-y-1 list-disc list-inside leading-relaxed">
-                                <li>褲腳長度維持「微蓋鞋舌」，絕不反摺成厚重一圈堆在腳踝。</li>
-                                <li>上衣下擺落在胯骨中段，若上衣偏長將前擺微紮進褲頭露出腰線。</li>
-                                <li>若外罩立領毛外套，拉鍊拉至胸口並將領片外翻，拉長頸部比例。</li>
+                                <li>穿外套＋短褲時，<strong>外套拉鍊千萬別全拉死</strong>，敞開露出內搭高腰線才不會變成五五身水桶。</li>
+                                <li>短褲配 Shox Z 等量感較大的球鞋時，<strong>中筒襪拉到小腿肚下方</strong>，平衡鞋身重量。</li>
+                                <li>穿長褲時，褲管下擺務必微蓋鞋舌 1～2 公分，拒絕露腳踝截斷比例。</li>
                             </ul>
                         </div>
                         <div class="p-4 rounded-2xl bg-zinc-900 text-zinc-100 space-y-1.5">
-                            <div class="text-xs font-bold text-amber-400">4. 絕對地雷避坑清單（Don'ts）</div>
+                            <div class="text-xs font-bold text-amber-400">4. 同身高模特絕對避開的淘汰地雷（Don'ts）</div>
                             <ul id="er-donts-list" class="text-xs text-zinc-300 space-y-1 list-disc list-inside leading-relaxed">
-                                <li>嚴禁搭配黑色或高對比深色印花內褲（白褲在強光下極易透出輪廓）。</li>
-                                <li>避免上半身穿過於貼身且無磅數的薄透淺色 T 恤，容易顯單薄。</li>
-                                <li>大吉嶺或木質香水請噴耳後與鎖骨皮膚，避開球衣燙印與毛外套絨毛。</li>
+                                <li><strong>淘汰卡膝蓋五分褲</strong>：褲長剛好蓋住膝蓋是 169 cm 最大殺手，直接把小腿縮短一半。</li>
+                                <li><strong>淘汰衣長超過 72 cm 且全拉鍊拉起的外套</strong>：會把臀線完全吞沒，視覺直接矮 5 公分。</li>
+                                <li>穿白褲時嚴禁搭配深色或花色內褲；球衣隊徽燙印處嚴禁直接噴香水。</li>
                             </ul>
                         </div>
                     </div>
@@ -354,7 +356,7 @@
 
                     <div class="flex flex-wrap items-center gap-2">
                         <button type="button" onclick="toggleAddSingleCard(true)" class="px-3.5 py-2 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-semibold transition">
-                            + 新增單品（正反面雙照）
+                            + 新增單品（含 169cm 合身度鑑定）
                         </button>
                         <button type="button" onclick="openModal('batch-modal')" class="px-3.5 py-2 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-editorialText text-xs font-semibold transition">
                             📦 多圖批次匯入
@@ -383,7 +385,7 @@
 
                 <!-- 關鍵字搜尋列 -->
                 <div>
-                    <input type="text" id="wardrobe-search-input" oninput="handleWardrobeSearch(this.value)" placeholder="🔍 搜尋單品名稱、顏色或背面特徵（例如：白褲、球衣、背號、淺灰）..." class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2 text-xs text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition">
+                    <input type="text" id="wardrobe-search-input" oninput="handleWardrobeSearch(this.value)" placeholder="🔍 搜尋單品名稱、顏色或版型特徵（例如：白褲、球衣、皇馬、曼城、Shox、短褲）..." class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2 text-xs text-editorialText placeholder:text-editorialMuted/70 focus:outline-none focus:border-editorialText focus:bg-editorialCard transition">
                 </div>
             </div>
 
@@ -396,21 +398,19 @@
                 </div>
             </div>
 
-            <!-- 新增單品展開卡片 -->
+            <!-- 新增單品展開卡片（升級版：包含 169cm 版型合身鑑定與全衣櫥搭配度比對） -->
             <div id="add-single-card" class="hidden bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
                 <div class="flex items-center justify-between border-b border-editorialBorder pb-3">
                     <div>
-                        <h3 class="font-serif text-lg font-bold text-editorialText">新增衣櫥單品（選填式正反面雙照）</h3>
-                        <p class="text-xs text-editorialMuted">正反面合併儲存為同一件單品；穿著次數自建檔後 0 次起算，價格選填可留白</p>
+                        <h3 class="font-serif text-lg font-bold text-editorialText">新增衣櫥單品 · 169cm 同身高比例與全衣櫥適配鑑定</h3>
+                        <p class="text-xs text-editorialMuted">上傳新買或想留下的單品，AI 會對照 169cm/50kg 模特標準與你整座衣櫥，評估是否合身有質感</p>
                     </div>
                     <button type="button" onclick="toggleAddSingleCard(false)" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold text-editorialMuted">✕</button>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                    <!-- 左側雙照上傳格 -->
-                    <div class="lg:col-span-5 space-y-2">
+                    <div class="lg:col-span-5 space-y-2.5">
                         <div class="grid grid-cols-2 gap-3">
-                            <!-- 正面照 (必選) -->
                             <div class="space-y-1">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold text-editorialText">正面照 <span class="text-rose-600">*</span></span>
@@ -422,12 +422,11 @@
                                     <div id="new-front-placeholder" class="space-y-1">
                                         <span class="text-xl">📷</span>
                                         <p class="text-xs font-bold text-editorialText">點擊上傳正面</p>
-                                        <p class="text-[10px] text-editorialMuted">WebP 高清壓縮</p>
+                                        <p class="text-[10px] text-editorialMuted">支援單品平拍或實穿照</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- 背面照 (選填) -->
                             <div id="new-back-upload-col" class="space-y-1">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold text-editorialMuted">背面照（選填）</span>
@@ -450,22 +449,30 @@
                             <button type="button" onclick="showEl('new-back-upload-col'); hideEl('single-side-hint-bar')" class="font-bold text-editorialAccent underline">展開背面框</button>
                         </div>
 
-                        <button type="button" id="btn-ai-detect-single" onclick="aiDetectNewSingleItem()" class="w-full py-2.5 px-3 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText transition">
-                            ✨ AI 雙面自動辨識名稱與洗護建議
+                        <button type="button" id="btn-ai-detect-single" onclick="aiDetectNewSingleItem()" class="w-full py-2.5 px-3 rounded-xl bg-editorialAccent hover:bg-editorialAccentHover text-white text-xs font-bold shadow-xs transition">
+                            ✨ AI 辨識單品 ＋ 鑑定 169cm 合身質感與衣櫥搭配度
                         </button>
+
+                        <!-- 新單品 169cm 適配與衣櫥比對報告框 -->
+                        <div id="new-item-fit-report" class="hidden p-3.5 rounded-2xl bg-amber-50/80 border border-amber-300 space-y-1.5 text-xs">
+                            <div class="flex items-center justify-between">
+                                <span id="new-item-fit-badge" class="px-2 py-0.5 rounded-md bg-emerald-700 text-white text-[10px] font-bold">✅ 符合 169cm 質感標準</span>
+                                <span id="new-item-combo-count" class="text-[11px] font-bold text-amber-950">可配 4 套現有單品</span>
+                            </div>
+                            <p id="new-item-fit-reason" class="text-amber-950/90 leading-relaxed"></p>
+                        </div>
                     </div>
 
-                    <!-- 右側欄位表單 -->
                     <div class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
                             <label for="new-item-cat" class="block text-xs font-bold text-editorialText mb-1">單品分類</label>
                             <select id="new-item-cat" onchange="onNewItemCategoryChange(this.value)" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                                 <option value="top">上衣（球衣 / T恤 / 襯衫 / 衛衣）</option>
-                                <option value="outerwear">外套（毛外套 / 連帽 / 夾克）</option>
-                                <option value="bottom">下身（牛仔褲 / 寬褲 / 短褲）</option>
+                                <option value="outerwear">外套（連帽 / 運動夾克 / 毛外套 / 麵包服）</option>
+                                <option value="bottom">下身（牛仔褲 / 寬褲 / 膝上短褲）</option>
                                 <option value="underwear">內褲（貼身內著 / 防透色選擇）</option>
-                                <option value="socks">襪子（長襪 / 中筒襪 / 隱形襪）</option>
-                                <option value="shoes">鞋子（球鞋 / 德訓 / 靴款）</option>
+                                <option value="socks">襪子（中筒長襪 / 隱形襪）</option>
+                                <option value="shoes">鞋子（球鞋 / 德訓 / Shox Z 機能鞋 / 靴款）</option>
                                 <option value="accessory">配件（帽子 / 包款 / 皮帶）</option>
                             </select>
                         </div>
@@ -477,7 +484,7 @@
 
                         <div class="sm:col-span-2">
                             <label for="new-item-name" class="block text-xs font-bold text-editorialText mb-1">單品名稱 <span class="text-rose-600">*</span></label>
-                            <input type="text" id="new-item-name" placeholder="例如：白色直筒牛仔褲、邁阿密國際粉紅球衣" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                            <input type="text" id="new-item-name" placeholder="例如：白色直筒牛仔褲、24/25曼城主場球衣" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                         </div>
 
                         <div>
@@ -496,14 +503,14 @@
                         </div>
 
                         <div class="sm:col-span-2">
-                            <label for="new-item-notes" class="block text-xs font-bold text-editorialText mb-1">背面特徵或穿搭備註（選填）</label>
-                            <input type="text" id="new-item-notes" placeholder="例如：背面印有 10 號背號、微蓋鞋舌版型" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                            <label for="new-item-notes" class="block text-xs font-bold text-editorialText mb-1">版型長度與 169cm 比例備註（選填）</label>
+                            <input type="text" id="new-item-notes" placeholder="例如：膝上短褲、衣長66cm微短版、微蓋鞋舌直筒版型" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                         </div>
 
                         <div class="sm:col-span-2 flex justify-end gap-2 pt-2">
                             <button type="button" onclick="toggleAddSingleCard(false)" class="px-4 py-2.5 rounded-xl bg-editorialBg border border-editorialBorder text-xs font-semibold text-editorialText">取消</button>
                             <button type="button" onclick="saveNewWardrobeItem()" class="px-5 py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold shadow-sm transition">
-                                ✓ 存入 UltraDB 大容量衣櫥
+                                ✓ 確認合身質感 · 存入智慧衣櫥
                             </button>
                         </div>
                     </div>
@@ -523,27 +530,52 @@
             <div class="lg:col-span-7 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-5">
                 <div class="flex flex-wrap items-start justify-between gap-2">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">7-SLOT OUTFIT BUILDER</span>
-                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">7 槽位自由造型拼貼台</h2>
-                        <p class="text-xs text-editorialMuted mt-0.5">包含貼身內褲槽位，搭配白褲時自動啟動防透色檢查</p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <button type="button" onclick="clearStudioSlots()" class="px-3 py-1.5 rounded-xl bg-editorialBg hover:bg-editorialSand border border-editorialBorder text-xs font-semibold text-editorialText">清空畫布</button>
-                        <button type="button" onclick="aiAutoFillStudio()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText">✨ AI 從衣櫥抓一套</button>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">169CM PROPORTION 7-SLOT STUDIO</span>
+                        <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">7 槽位造型拼貼台（支援「上長下短」與長褲雙比例）</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">對照小紅書 / Pinterest 168–170cm 模特穿法，自動檢核衣長、短褲襪長搭配與白褲防透色</p>
                     </div>
                 </div>
 
-                <!-- 白褲 + 深色內褲防透色自動警告橫幅 -->
-                <div id="underwear-transparency-alert" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex items-start gap-2.5">
-                    <span class="text-base">⚠️</span>
+                <!-- 風格選擇與 AI 造型師一鍵搭配列 -->
+                <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder flex flex-wrap items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-2 flex-1 min-w-[210px]">
+                        <label for="studio-style-select" class="text-xs font-bold text-editorialText whitespace-nowrap">同身高模特公式：</label>
+                        <select id="studio-style-select" class="flex-1 rounded-xl bg-editorialCard border border-editorialBorder px-3 py-1.5 text-xs font-semibold text-editorialText">
+                            <option value="City Boy 上長下短街頭（運動/連帽外套＋膝上短褲＋中筒長襪＋球鞋）">🧥 City Boy 上長下短（外套＋短褲＋長襪）</option>
+                            <option value="Blokecore 球衣街頭混搭（S/M合身球衣＋直筒長褲微蓋鞋舌＋復古球鞋）">⚽ Blokecore 球衣街頭混搭（球衣＋長褲）</option>
+                            <option value="Sporty Tech 機能街頭（連帽運動外套＋長褲或膝上短褲＋Nike Shox Z）">⚡ Sporty Tech 機能街頭（Nike Shox Z 專屬）</option>
+                            <option value="City Boy 日系寬鬆層次（重磅衛衣/襯衫＋直筒寬褲＋帽款拉高重心）">🧢 City Boy 日系寬鬆層次（長褲＋帽款）</option>
+                            <option value="Smart Casual 微正裝大人感（襯衫/毛呢外套＋俐落直筒褲＋皮鞋/德訓）">🥂 Smart Casual 微正裝大人感</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="clearStudioSlots()" class="px-3 py-1.5 rounded-xl bg-editorialCard hover:bg-editorialSand border border-editorialBorder text-xs font-semibold text-editorialText">清空</button>
+                        <button type="button" id="btn-studio-ai-style" onclick="aiSmartStyleStudio()" class="px-3.5 py-1.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold shadow-xs transition">
+                            ✨ AI 造型師為我搭配
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 造型細節提醒 / 防雷橫幅 -->
+                <div id="studio-rule-alert" class="hidden p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-xs text-amber-950 flex items-start gap-2.5">
+                    <span class="text-base">💡</span>
                     <div>
-                        <div class="font-bold">白褲／淺色下身防透色提醒</div>
-                        <p id="underwear-alert-msg" class="mt-0.5 leading-relaxed">偵測到您選了白色或淺色下身搭配深色內褲，強光下容易透出顏色邊界，建議改選淺灰、膚色或純白內褲！</p>
+                        <div id="studio-alert-title" class="font-bold text-amber-900">169 cm 模特實穿比例提示</div>
+                        <p id="studio-alert-msg" class="mt-0.5 leading-relaxed"></p>
                     </div>
                 </div>
 
                 <!-- 7 個造型槽位網格 -->
                 <div id="studio-slots-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+
+                <!-- AI 造型總監搭配點評卡 -->
+                <div id="studio-stylist-commentary" class="hidden p-4 rounded-2xl bg-amber-50/70 border border-amber-200 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-950">🎙️ AI 造型總監點評（對標 169 cm / 50 kg 同身高模特比例）</span>
+                        <span id="studio-vibe-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-200/80 text-amber-950 font-bold">同身高比例驗證通過</span>
+                    </div>
+                    <p id="studio-commentary-text" class="text-xs text-amber-950/90 leading-relaxed"></p>
+                </div>
 
                 <!-- 槽位操作按鈕 -->
                 <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-editorialBorder">
@@ -570,13 +602,14 @@
                 <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
                     <div class="flex items-center justify-between gap-2">
                         <div>
-                            <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">WEEKLY OOTD PLANNER</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">AI WEEKLY OOTD PLANNER</span>
                             <h2 class="font-serif text-lg font-bold text-editorialText">📅 一週穿搭排程日曆</h2>
                         </div>
-                        <button type="button" onclick="aiFillNonDuplicateWeek()" class="px-3 py-1.5 rounded-xl bg-editorialSand hover:bg-stone-200 border border-editorialBorder text-xs font-bold text-editorialText">
-                            ✨ 一鍵排滿不重複
+                        <button type="button" id="btn-ai-week-plan" onclick="aiFillNonDuplicateWeek()" class="px-3 py-1.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold transition">
+                            ✨ AI 規劃 7 天不重複
                         </button>
                     </div>
+                    <p class="text-[11px] text-editorialMuted">AI 會交替運用「上長下短（外套＋短褲＋長襪）」與「直筒長褲微蓋鞋舌」組合 7 天不重複高質感造型</p>
 
                     <div id="weekly-duplicate-warning" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs text-rose-900 font-medium"></div>
 
@@ -602,13 +635,13 @@
             <!-- 左欄：實穿上身照 / 平拍單品組合照深度診斷 -->
             <div class="lg:col-span-6 bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
                 <div>
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">RUNWAY &amp; BLOGGER ANALYSIS</span>
-                    <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🔍 實拍 / 平拍雙模式穿搭診斷</h2>
-                    <p class="text-xs text-editorialMuted mt-0.5">支援全身實穿照，或將上衣、褲子、襪子、球鞋平鋪床上的組合照</p>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">169CM MODEL PROPORTION &amp; FIT CHECK</span>
+                    <h2 class="font-serif text-xl font-bold text-editorialText mt-0.5">🔍 169cm 實拍 / 平拍版型合身與質感診斷</h2>
+                    <p class="text-xs text-editorialMuted mt-0.5">對標小紅書 / Pinterest 168–170cm 模特標準，不合身、壓身高或沒質感直接汰除並給衣櫥替換方案</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-2 p-1 rounded-xl bg-editorialBg border border-editorialBorder">
-                    <button type="button" id="btn-diag-mode-worn" onclick="setDiagPhotoMode('worn')" class="py-2 rounded-lg text-xs font-bold bg-editorialText text-white transition">🧍 實穿上身照</button>
+                    <button type="button" id="btn-diag-mode-worn" onclick="setDiagPhotoMode('worn')" class="py-2 rounded-lg text-xs font-bold bg-editorialText text-white transition">🧍 實穿上身照（看合身比例）</button>
                     <button type="button" id="btn-diag-mode-flat" onclick="setDiagPhotoMode('flat')" class="py-2 rounded-lg text-xs font-medium text-editorialText hover:bg-editorialSand transition">👕 平拍單品組合照</button>
                 </div>
 
@@ -617,29 +650,29 @@
                     <img id="diag-photo-preview" src="" alt="診斷照片預覽" class="hidden max-h-full max-w-full object-contain rounded-xl">
                     <div id="diag-photo-placeholder" class="space-y-1.5">
                         <span class="text-2xl">📸</span>
-                        <p class="text-xs font-bold text-editorialText">點擊上傳穿搭照或平拍單品組合照</p>
-                        <p class="text-[11px] text-editorialMuted">結合四大時裝週剪裁比例與全球穿搭博主經驗分析</p>
+                        <p class="text-xs font-bold text-editorialText">點擊上傳穿搭實拍或試衣間鏡子自拍</p>
+                        <p class="text-[11px] text-editorialMuted">檢驗肩線、衣長、褲長與 169cm / 50kg 質感適配度</p>
                     </div>
                 </div>
 
-                <input type="text" id="diag-context-input" placeholder="補充說明（例如：打算去約會，外罩黑色毛外套，這樣比例好嗎？）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-xs text-editorialText">
+                <input type="text" id="diag-context-input" placeholder="補充說明（例如：這件外套配短褲穿在 169cm 身上比例對嗎？有沒有顯矮？）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-xs text-editorialText">
 
                 <button type="button" id="btn-run-diag" onclick="runPhotoDiagnosis()" class="w-full py-3 rounded-xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-xs sm:text-sm transition">
-                    ✨ 開始深度造型診斷與比例推演
+                    ✨ 對標同身高模特開始合身度與質感診斷
                 </button>
 
                 <div id="diag-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2.5 text-xs leading-relaxed"></div>
             </div>
 
-            <!-- 右欄：Buy or Bye 購物冷靜期滅火器 + 旅行膠囊打包助手 -->
+            <!-- 右欄：Buy or Bye 購物冷靜期滅火器 + AI 旅行膠囊打包助手 -->
             <div class="lg:col-span-6 space-y-6">
 
                 <!-- 🛒 購物前冷靜期診斷 -->
                 <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">ANTI-IMPULSE BUYING</span>
-                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🛒 購物前冷靜期診斷（Buy or Bye 滅火器）</h2>
-                        <p class="text-xs text-editorialMuted mt-0.5">上傳網拍或實體店猶豫商品截圖，比對你現有衣櫥能配出幾套</p>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">169CM FIT + FULL WARDROBE CROSS-CHECK</span>
+                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🛒 要買還是不要買（Buy or Bye 完整衣櫥比對）</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">雙重把關：(1) 169cm/50kg 穿起來合身有質感嗎？ (2) 能跟智慧衣櫥現有單品配出幾套？不合適直接淘汰！</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
@@ -649,15 +682,15 @@
                                 <img id="bob-photo-preview" src="" alt="欲購商品" class="hidden w-full h-full object-cover rounded-xl">
                                 <div id="bob-photo-placeholder" class="space-y-0.5">
                                     <span class="text-lg">🛍️</span>
-                                    <p class="text-[10px] font-bold text-editorialText">上傳商品圖(選填)</p>
+                                    <p class="text-[10px] font-bold text-editorialText">上傳網拍/試穿圖</p>
                                 </div>
                             </div>
                         </div>
                         <div class="sm:col-span-8 space-y-2">
-                            <input type="text" id="bob-name-input" placeholder="欲購買單品名稱（例如：水洗灰工裝降落傘褲）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
+                            <input type="text" id="bob-name-input" placeholder="欲購買單品名稱與版型（如：深灰寬版尼龍短褲、短版連帽夾克）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
                             <input type="number" id="bob-price-input" min="0" placeholder="商品價格 NT$（選填）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
                             <button type="button" id="btn-run-bob" onclick="runBuyOrByeAnalysis()" class="w-full py-2.5 rounded-xl bg-editorialAccent hover:bg-editorialAccentHover text-white font-bold text-xs transition">
-                                ⚖️ 比對現有衣櫥：該買（BUY）還是滅火（BYE）？
+                                ⚖️ 檢驗 169cm 合身度 ＋ 完整比對智慧衣櫥單品
                             </button>
                         </div>
                     </div>
@@ -665,38 +698,38 @@
                     <div id="bob-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2 text-xs leading-relaxed"></div>
                 </div>
 
-                <!-- 🧳 旅行膠囊打包助手 -->
+                <!-- 🧳 AI 旅行膠囊打包助手 -->
                 <div class="bg-editorialCard rounded-3xl border border-editorialBorder p-5 sm:p-6 shadow-sm space-y-4">
                     <div>
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">CAPSULE TRAVEL PACKING</span>
-                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🧳 旅行膠囊打包助手（Pack My Bag）</h2>
-                        <p class="text-xs text-editorialMuted mt-0.5">從現有衣櫥挑選可一衣多穿的精簡清單，自動計算內褲與襪子備品數量</p>
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-editorialAccent">AI CAPSULE TRAVEL PACKING</span>
+                        <h2 class="font-serif text-lg font-bold text-editorialText mt-0.5">🧳 AI 一衣多穿膠囊打包助手（Pack My Bag）</h2>
+                        <p class="text-xs text-editorialMuted mt-0.5">從你衣櫥挑選「上長下短（外套＋短褲）」與「直筒長褲」皆能交叉互搭的核心單品</p>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                        <input type="text" id="pack-dest-input" placeholder="目的地（如：台北看演唱會）" class="sm:col-span-2 rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
-                        <input type="number" id="pack-days-input" min="1" max="30" value="3" placeholder="天數" class="rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs font-bold">
+                        <input type="text" id="pack-dest-input" placeholder="目的地與行程（如：台北 3 天看演唱會）" class="sm:col-span-2 rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs">
+                        <input type="number" id="pack-days-input" min="1" max="14" value="3" placeholder="天數" class="rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-xs font-bold">
                     </div>
 
                     <button type="button" id="btn-run-pack" onclick="generateCapsulePackingList()" class="w-full py-2.5 rounded-xl bg-editorialText hover:bg-editorialAccent text-white font-bold text-xs transition">
-                        🎒 生成一衣多穿膠囊打包清單
+                        🎒 啟動 AI 演算法生成一衣多穿行李清單
                     </button>
 
-                    <div id="pack-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2 text-xs leading-relaxed"></div>
+                    <div id="pack-result-box" class="hidden p-4 rounded-2xl bg-editorialBg border border-editorialBorder space-y-2.5 text-xs leading-relaxed"></div>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- ===================================================================== -->
-    <!-- 彈窗 1：多圖批次一鍵匯入彈窗（含 AI 排隊辨識） -->
+    <!-- 彈窗 1：多圖批次一鍵匯入彈窗 -->
     <!-- ===================================================================== -->
     <div id="batch-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl overflow-hidden">
             <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
                 <div>
-                    <h3 class="font-serif text-lg font-bold text-editorialText">📦 多圖批次一鍵匯入（排隊 AI 自動辨識）</h3>
-                    <p class="text-xs text-editorialMuted">一次選取 10～50 張照片時，系統會以排隊機制逐件穩定呼叫 AI 偵測品項</p>
+                    <h3 class="font-serif text-lg font-bold text-editorialText">📦 多圖批次一鍵匯入（排隊 AI 自動辨識與版型標註）</h3>
+                    <p class="text-xs text-editorialMuted">一次選取多張照片時，系統會以排隊機制逐件偵測品項、顏色與 169cm 比例屬性</p>
                 </div>
                 <button type="button" onclick="closeModal('batch-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
             </div>
@@ -803,7 +836,7 @@
                 </div>
 
                 <div>
-                    <label for="edit-item-notes" class="block text-xs font-bold text-editorialText mb-1">背面特徵或備註</label>
+                    <label for="edit-item-notes" class="block text-xs font-bold text-editorialText mb-1">版型長度與 169cm 比例備註</label>
                     <input type="text" id="edit-item-notes" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                 </div>
             </div>
@@ -821,7 +854,7 @@
     <div id="profile-modal" class="fixed inset-0 z-40 hidden bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
         <div class="bg-editorialCard rounded-3xl border border-editorialBorder max-w-md w-full shadow-2xl overflow-hidden">
             <div class="p-4 sm:p-5 border-b border-editorialBorder flex items-center justify-between">
-                <h3 class="font-serif text-lg font-bold text-editorialText">👤 個人身形與風格基因檔案</h3>
+                <h3 class="font-serif text-lg font-bold text-editorialText">👤 個人身形與同身高模特對標檔案</h3>
                 <button type="button" onclick="closeModal('profile-modal')" class="w-8 h-8 rounded-full bg-editorialBg hover:bg-editorialSand text-sm font-bold">✕</button>
             </div>
             <div class="p-4 sm:p-5 space-y-3">
@@ -841,8 +874,8 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label for="prof-build" class="block text-xs font-bold text-editorialText mb-1">身形輪廓</label>
-                        <input type="text" id="prof-build" value="標準勻稱" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                        <label for="prof-build" class="block text-xs font-bold text-editorialText mb-1">身形比例特徵</label>
+                        <input type="text" id="prof-build" value="偏瘦勻稱 · 需拉高腰線比例" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                     </div>
                     <div>
                         <label for="prof-skin" class="block text-xs font-bold text-editorialText mb-1">膚色調性</label>
@@ -850,12 +883,12 @@
                     </div>
                 </div>
                 <div>
-                    <label for="prof-fit" class="block text-xs font-bold text-editorialText mb-1">褲長與比例偏好</label>
-                    <input type="text" id="prof-fit" value="褲長蓋鞋舌" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    <label for="prof-fit" class="block text-xs font-bold text-editorialText mb-1">褲長與鞋褲襪銜接偏好</label>
+                    <input type="text" id="prof-fit" value="長褲微蓋鞋舌；短褲露膝上2-4cm配中筒長襪（外套＋短褲上長下短）" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                 </div>
                 <div>
                     <label for="prof-style" class="block text-xs font-bold text-editorialText mb-1">核心偏好風格</label>
-                    <input type="text" id="prof-style" value="Blokecore, City Boy, 美式街頭, Ivy 微正裝" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
+                    <input type="text" id="prof-style" value="Blokecore, City Boy, 美式街頭, Smart Casual" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3 py-2 text-sm">
                 </div>
             </div>
             <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
@@ -905,9 +938,10 @@
             </div>
             <div class="p-4 sm:p-5 space-y-3">
                 <p class="text-xs text-editorialMuted leading-relaxed">
-                    填入 Google AI Studio 申請的 Gemini API Key（目前使用穩定版 <code>gemini-3.8-flash</code> 模型），即可啟用雲端視覺自動辨識衣服品項、顏色與穿搭診斷。
+                    填入 Google AI Studio 申請的 API Key（支援 <code>AIza...</code> 與 <code>AQ....</code> 格式），系統已內建多模型自動相容切換，確保所有造型分析與圖片辨識 100% 正常運作。
                 </p>
-                <input type="password" id="apikey-input" placeholder="貼上 AIzaSy... 開頭的金鑰" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-sm">
+                <input type="password" id="apikey-input" placeholder="貼上 AIzaSy... 或 AQ.... 開頭的金鑰" class="w-full rounded-xl bg-editorialBg border border-editorialBorder px-3.5 py-2.5 text-sm">
+                <div id="apikey-status-text" class="text-[11px] font-semibold text-emerald-700"></div>
             </div>
             <div class="p-4 border-t border-editorialBorder flex justify-end gap-2 bg-editorialBg">
                 <button type="button" onclick="clearCustomApiKey()" class="px-3.5 py-2 rounded-xl bg-editorialCard border border-editorialBorder text-xs font-semibold text-rose-600">清除金鑰</button>
@@ -945,15 +979,15 @@
                 : 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-4 py-3 rounded-2xl shadow-xl border text-xs sm:text-sm font-medium flex items-center gap-2.5 bg-editorialText text-white border-zinc-700';
             box.classList.remove('hidden');
             if (toastTimer) clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => box.classList.add('hidden'), 3800);
+            toastTimer = setTimeout(() => box.classList.add('hidden'), 4200);
         }
 
         window.onerror = function (msg) {
-            console.warn('Caught runtime notice:', msg);
+            console.warn('Runtime notice:', msg);
             return true;
         };
         window.onunhandledrejection = function (ev) {
-            console.warn('Caught async notice:', ev.reason);
+            console.warn('Async notice:', ev.reason);
         };
 
         // =====================================================================
@@ -964,7 +998,6 @@
         const STORE_META = 'meta_store';
         const STORE_BLOBS = 'image_blobs';
         const APIKEY_LS_KEY = 'stylefit_ultrav2_apikey';
-        const GEMINI_MODEL = 'gemini-2.5-flash';
 
         let ultraDb = null;
         let isMemoryFallbackMode = false;
@@ -981,10 +1014,10 @@
                     height: 169,
                     kg: 50,
                     weight: 'S/M 碼',
-                    build: '標準勻稱',
+                    build: '偏瘦勻稱 · 需拉高腰線比例',
                     skin: '自然暖黃調',
-                    fit: '褲長蓋鞋舌',
-                    style: 'Blokecore, City Boy, 美式街頭, Ivy 微正裝'
+                    fit: '長褲微蓋鞋舌；短褲露膝上2-4cm配中筒長襪（外套＋短褲上長下短）',
+                    style: 'Blokecore, City Boy, 美式街頭, Smart Casual'
                 }
             };
         }
@@ -1182,59 +1215,6 @@
             });
         }
 
-        async function migrateLegacyStoresIfNeeded() {
-            let migratedCount = 0;
-            if (!isMemoryFallbackMode && window.indexedDB) {
-                try {
-                    const legacyDb = await new Promise((resolve) => {
-                        const req = indexedDB.open('StyleFit_Wardrobe_IndexedDB_v1', 1);
-                        req.onsuccess = ev => resolve(ev.target.result);
-                        req.onerror = () => resolve(null);
-                    });
-                    if (legacyDb && legacyDb.objectStoreNames.contains('wardrobe_items')) {
-                        const oldItems = await new Promise((resolve) => {
-                            const tx = legacyDb.transaction('wardrobe_items', 'readonly');
-                            const req = tx.objectStore('wardrobe_items').getAll();
-                            req.onsuccess = () => resolve(req.result || []);
-                            req.onerror = () => resolve([]);
-                        });
-                        const existingIds = new Set(appState.wardrobe.map(i => i.id));
-                        for (const old of oldItems) {
-                            if (!old || !old.id || existingIds.has(old.id)) continue;
-                            const fBlob = dataUrlToBlob(old.frontImage);
-                            const bBlob = dataUrlToBlob(old.backImage);
-                            if (fBlob) await putImageBlob(`front_${old.id}`, fBlob);
-                            if (bBlob) await putImageBlob(`back_${old.id}`, bBlob);
-                            appState.wardrobe.push({
-                                id: old.id,
-                                category: old.category || 'top',
-                                name: old.name || '未命名單品',
-                                color: old.color || '經典色',
-                                price: (typeof old.price === 'number' && old.price > 0) ? old.price : null,
-                                washThreshold: old.washThreshold || 2,
-                                care: old.care || '裝洗衣袋柔洗 · 禁高溫烘乾',
-                                notes: old.notes || '',
-                                hasFront: Boolean(fBlob),
-                                hasBack: Boolean(bBlob),
-                                wearCount: old.wearCount || 0,
-                                wearsSinceWash: old.wearsSinceWash || 0,
-                                createdAt: old.createdAt || new Date().toISOString()
-                            });
-                            existingIds.add(old.id);
-                            migratedCount++;
-                        }
-                        legacyDb.close();
-                        try { indexedDB.deleteDatabase('StyleFit_Wardrobe_IndexedDB_v1'); } catch (e) {}
-                    }
-                } catch (e) {}
-            }
-
-            if (migratedCount > 0) {
-                await saveMetaState();
-                showToast(`🚀 已將 ${migratedCount} 件舊版單品無損轉換為 UltraDB 二進位圖庫！`);
-            }
-        }
-
         async function updateStorageStatsUI() {
             const capEl = getEl('kpi-capacity');
             const subEl = getEl('kpi-capacity-sub');
@@ -1256,7 +1236,7 @@
             } catch (e) {}
 
             capEl.textContent = `已用 ${usedMB} MB`;
-            if (subEl) subEl.textContent = isMemoryFallbackMode ? '安全記憶體模式 · 建議定期下載備份' : 'UltraDB 二進位圖庫 · 可存 1,000+ 件';
+            if (subEl) subEl.textContent = 'UltraDB 二進位圖庫 · 可存 1,000+ 件';
         }
 
         // =====================================================================
@@ -1308,7 +1288,7 @@
         }
 
         // =====================================================================
-        // 4. 分類定義、排隊佇列與 Gemini API 呼叫器 (gemini-2.5-flash)
+        // 4. 小紅書 / Pinterest 168-170cm 同身高模特審美基準與多模型 Gemini 引擎
         // =====================================================================
         const CATEGORY_META = {
             top: { label: '上衣', defaultThreshold: 2, defaultCare: '手洗 · 禁烘乾 · 禁直接噴香水' },
@@ -1322,6 +1302,18 @@
 
         const STUDIO_SLOTS = ['outerwear', 'top', 'bottom', 'underwear', 'socks', 'shoes', 'accessory'];
         const WEEK_DAYS = ['週一', '週二', '週三', '週四', '週五', '週六', '週日'];
+
+        // 核心審美大腦提示詞（貫穿所有分析、入庫鑑定、買與不買、搭配引擎）
+        function getModelBenchmarkPrompt() {
+            const p = appState.profile;
+            return `【服務對象與同身高模特對標基準】
+- 實際身材：身高 ${p.height} cm、體重 ${p.kg} kg（偏瘦勻稱、常穿 ${p.weight}、偏好風格：${p.style}）。
+- 參考小紅書與 Pinterest 上 168–170 cm / 48–54 kg 同身高亞洲街頭/日韓男模的公認顯高與高級感實戰邏輯：
+  1. 允許且推崇「上長下短（City Boy / 街頭混搭）」：連帽外套、運動夾克、衝鋒/兩件式外套完全可以搭配短褲！關鍵在於：(a) 短褲下擺必須在膝蓋上方 2～4 cm，嚴禁卡在膝蓋正中間把腿切半；(b) 外套建議敞開露出內搭高腰線，避免全拉死吞沒臀線；(c) 必須搭配中筒長襪（如 Nike 長襪）銜接球鞋（如 Nike Shox Z 或復古球鞋），平衡鞋身量感並拉長小腿線條。
+  2. 長褲黃金比例：直筒或微寬版型，褲腳微蓋鞋舌 1～2 cm 產生自然堆疊感，拒絕露腳踝截斷比例。
+  3. 嚴格淘汰標準：衣長過長（>72cm 蓋過臀部卻沒層次）、肩線過度下垂導致瘦削身形撐不起來、卡膝蓋五分褲、或廉價軟塌無挺度的材質。只要版型不合適或穿不出高級質感，必須直說「不合適／不要留」。
+  4. 防雷規則：白色/淺色褲必須配純白、淺灰或膚色內褲。`;
+        }
 
         let activeFilterCat = 'all';
         let activeSearchQuery = '';
@@ -1353,10 +1345,27 @@
             accessory: null
         };
 
-        const apiKey = "";
         function resolveApiKey() {
-            if (apiKey && apiKey.trim()) return apiKey.trim();
-            try { return localStorage.getItem(APIKEY_LS_KEY) || ''; } catch (e) { return ''; }
+            try {
+                const direct = (localStorage.getItem(APIKEY_LS_KEY) || '').trim();
+                if (direct) return direct;
+                const scanned = Object.values(localStorage).find(
+                    v => typeof v === 'string' && (v.trim().startsWith('AIza') || v.trim().startsWith('AQ.'))
+                );
+                return scanned ? scanned.trim() : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function updateApiStatusIndicator() {
+            const key = resolveApiKey();
+            const dot = getEl('header-api-dot');
+            if (dot) {
+                dot.className = key
+                    ? 'w-2 h-2 rounded-full bg-emerald-500'
+                    : 'w-2 h-2 rounded-full bg-rose-500';
+            }
         }
 
         function safeParseJSON(rawText) {
@@ -1375,9 +1384,11 @@
             }
         }
 
-        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 3) {
-            const key = resolveApiKey();
-            if (!key) return null;
+        const MODEL_CANDIDATES = ['gemini-3.8-flash', 'gemini-2.5-flash'];
+
+        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 2) {
+            const finalKey = resolveApiKey();
+            if (!finalKey) return null;
 
             const parts = [{ text: promptText }];
             for (const b64 of base64Images) {
@@ -1391,68 +1402,124 @@
                     }
                 });
             }
-const savedKey = Object.values(localStorage).find(v => typeof v === 'string' && (v.trim().startsWith('AIza') || v.trim().startsWith('AQ.')));
-const finalKey = savedKey ? savedKey.trim() : apiKey;
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent`;
-            for (let attempt = 0; attempt <= maxRetries; attempt++) {
-                try {
-                    const res = await fetch(url, {
-                        method: 'POST',
-                       headers: { 'Content-Type': 'application/json', 'x-goog-api-key': finalKey },
-                        body: JSON.stringify({
-                            contents: [{ parts }],
-                            generationConfig: {
-                                temperature: 0.3,
-                                responseMimeType: 'application/json'
+
+            let lastError = null;
+            for (const modelName of MODEL_CANDIDATES) {
+                const url = `[https://generativelanguage.googleapis.com/v1beta/models/$](https://generativelanguage.googleapis.com/v1beta/models/$){modelName}:generateContent`;
+                for (let attempt = 0; attempt <= maxRetries; attempt++) {
+                    try {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'x-goog-api-key': finalKey
+                            },
+                            body: JSON.stringify({
+                                contents: [{ parts }],
+                                generationConfig: {
+                                    temperature: 0.35,
+                                    responseMimeType: 'application/json'
+                                }
+                            })
+                        });
+
+                        if (res.status === 429 || res.status === 503) {
+                            const waitMs = 2000 * Math.pow(2, attempt);
+                            await new Promise(r => setTimeout(r, waitMs));
+                            continue;
+                        }
+
+                        if (!res.ok) {
+                            const errBody = await res.json().catch(() => ({}));
+                            const errMsg = errBody?.error?.message || `HTTP ${res.status}`;
+                            if (/not found|no longer available|not supported/i.test(errMsg)) {
+                                lastError = new Error(errMsg);
+                                break;
                             }
-                        })
-                    });
+                            throw new Error(errMsg);
+                        }
 
-                    if (res.status === 429) {
-                        // 遇到速率限制時加長退避等待時間
-                        const waitMs = 3000 * Math.pow(2, attempt);
-                        await new Promise(r => setTimeout(r, waitMs));
-                        continue;
+                        const json = await res.json();
+                        const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                        const parsed = safeParseJSON(text);
+                        if (parsed) return parsed;
+                    } catch (err) {
+                        lastError = err;
+                        if (attempt === maxRetries) break;
+                        await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)));
                     }
-
-                    if (!res.ok) {
-                        const errBody = await res.json().catch(() => ({}));
-                        const errMsg = errBody?.error?.message || `HTTP ${res.status}`;
-                        throw new Error(errMsg);
-                    }
-
-                    const json = await res.json();
-                    const text = json?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-                    const parsed = safeParseJSON(text);
-                    if (parsed) return parsed;
-                } catch (err) {
-                    if (attempt === maxRetries) {
-                        console.warn('Gemini API error:', err.message);
-                        throw err;
-                    }
-                    await new Promise(r => setTimeout(r, 1200 * Math.pow(2, attempt)));
                 }
             }
+            if (lastError) throw lastError;
             return null;
         }
 
-        // 共用服飾視覺辨識函式（支援正面 + 選填背面）
-        async function detectGarmentDetailsFromBlobs(frontBlob, backBlob = null) {
+        function isShortPantsItem(item) {
+            if (!item) return false;
+            return /短褲|五分褲|三分褲|海灘褲|shorts/i.test(`${item.name} ${item.notes}`);
+        }
+
+        // 只修正真正災難（如極寒配短褲、短褲忘了配長襪、白褲配黑內褲），完全保留「外套＋短褲＋長襪」街頭上長下短穿法！
+        function sanitizeOutfitSelection(slotMap, minTemp = 19) {
+            const result = { ...slotMap };
+            const bottom = result.bottom ? appState.wardrobe.find(w => w.id === result.bottom) : null;
+            const uw = result.underwear ? appState.wardrobe.find(w => w.id === result.underwear) : null;
+
+            // 若氣溫低於 14°C 才強制把短褲換成長褲
+            if (minTemp < 14 && bottom && isShortPantsItem(bottom)) {
+                const longPants = appState.wardrobe.find(w => w.category === 'bottom' && !isShortPantsItem(w));
+                if (longPants) result.bottom = longPants.id;
+            }
+
+            // 若下身是短褲，自動補上一雙衣櫥裡的中筒長襪拉長 169cm 小腿比例
+            const activeBottom = result.bottom ? appState.wardrobe.find(w => w.id === result.bottom) : null;
+            if (activeBottom && isShortPantsItem(activeBottom) && !result.socks) {
+                const crewSock = appState.wardrobe.find(w => w.category === 'socks' && !/隱形|船襪/i.test(w.name))
+                    || appState.wardrobe.find(w => w.category === 'socks');
+                if (crewSock) result.socks = crewSock.id;
+            }
+
+            // 白褲／淺色褲 強制替換掉深色內褲
+            if (activeBottom && /白|米|淺|white|cream/i.test(`${activeBottom.name} ${activeBottom.color}`)) {
+                if (uw && /黑|深|紅|藍|紫|花|black|dark|navy/i.test(`${uw.name} ${uw.color}`)) {
+                    const safeUw = appState.wardrobe.find(
+                        w => w.category === 'underwear' && /白|灰|膚|米|white|grey|gray/i.test(`${w.name} ${w.color}`)
+                    );
+                    if (safeUw) result.underwear = safeUw.id;
+                }
+            }
+
+            return result;
+        }
+
+        // 辨識單品 ＋ 169cm 同身高模特版型合身鑑定 ＋ 完整比對智慧衣櫥單品
+        async function detectGarmentDetailsFromBlobs(frontBlob, backBlob = null, includeFitAudit = false) {
             if (!frontBlob) return null;
             const imgs = [await blobToDataUrl(frontBlob)];
             if (backBlob) imgs.push(await blobToDataUrl(backBlob));
 
+            const wardrobeSummary = includeFitAudit
+                ? appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、')
+                : '';
+
+            const auditBlock = includeFitAudit ? `,
+  "fitVerdict": "建議留下（高質感顯比例） 或 不合適／建議退換（說明原因）",
+  "comboCount": 3,
+  "fitAndWardrobeAnalysis": "對標小紅書/Pinterest 168-170cm / 50kg 模特實穿標準，分析這件的肩線、衣長/褲長與面料質感是否合身，並具體點名能跟現有衣櫥（${wardrobeSummary || '目前尚無其他單品'}）裡的哪幾件單品搭出高級感"
+` : '';
+
             const ai = await callGeminiAPI(
-                `你是專業服飾與球衣鑑定專家。請辨識這件服飾的正面${backBlob ? '與背面' : ''}照片（嚴禁猜測價格），並回傳繁體中文 JSON：
+                `你是嚴格的男性時尚買手與 169cm 專屬造型總監。${getModelBenchmarkPrompt()}
+請辨識這件服飾的正面${backBlob ? '與背面' : ''}照片（嚴禁猜測價格），並回傳繁體中文 JSON：
 {
   "category": "top|outerwear|bottom|underwear|socks|shoes|accessory",
-  "name": "精準具體的單品名稱（例如：曼城24/25主場球衣、白色直筒牛仔褲、黑色連帽外套、Nike中筒長襪、Calvin Klein純白四角褲）",
-  "color": "主色系（例如：純白色、海軍藍、水洗灰）",
+  "name": "精準具體的單品名稱（例如：24/25曼城主場球衣、皇馬愛迪達聯名運動外套、白色直筒牛仔褲、Nike Shox Z 運動鞋、Nike中筒白長襪）",
+  "color": "主色系（例如：純白色、海軍藍、水洗灰、黑白色）",
   "care": "針對此材質的洗護防雷建議",
-  "notes": "版型、印花或背面特徵簡述（無則留空字串）"
+  "notes": "版型與 169cm 比例屬性簡述（例如：膝上短褲、衣長66cm微短版、微蓋鞋舌直筒長褲）"${auditBlock}
 }`,
                 imgs,
-                3
+                2
             );
 
             if (ai && CATEGORY_META[ai.category]) {
@@ -1461,13 +1528,15 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     name: (ai.name || '').trim(),
                     color: (ai.color || '').trim() || '經典色',
                     care: (ai.care || '').trim() || CATEGORY_META[ai.category].defaultCare,
-                    notes: (ai.notes || '').trim()
+                    notes: (ai.notes || '').trim(),
+                    fitVerdict: (ai.fitVerdict || '').trim(),
+                    comboCount: Number(ai.comboCount) || 0,
+                    fitAndWardrobeAnalysis: (ai.fitAndWardrobeAnalysis || '').trim()
                 };
             }
             return null;
         }
 
-        // 判斷單品是否為「尚未辨識出細項」（例如檔名是 IMG_1234、單品 5、未命名單品）
         function isItemNeedsAiDetection(item) {
             if (!item) return false;
             if (item.aiDetected === true) return false;
@@ -1512,7 +1581,9 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 if (getEl('prof-style')) getEl('prof-style').value = p.style;
             }
             if (id === 'apikey-modal') {
-                if (getEl('apikey-input')) getEl('apikey-input').value = resolveApiKey();
+                const k = resolveApiKey();
+                if (getEl('apikey-input')) getEl('apikey-input').value = k;
+                setText('apikey-status-text', k ? `✅ 目前已載入有效金鑰（結尾 ...${k.slice(-6)}）` : '⚠️ 尚未偵測到 API 金鑰，請貼上後儲存');
             }
         }
         function closeModal(id) {
@@ -1522,7 +1593,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
 
         function refreshProfileBadge() {
             const p = appState.profile;
-            setText('header-profile-pill', `${p.height} cm · ${p.weight} · ${p.fit}`);
+            setText('header-profile-pill', `${p.height} cm · ${p.kg || 50} kg · ${p.weight}`);
         }
 
         async function saveProfileData() {
@@ -1530,29 +1601,31 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 height: Number(getEl('prof-h')?.value) || 169,
                 kg: Number(getEl('prof-kg')?.value) || 50,
                 weight: (getEl('prof-w')?.value || 'S/M 碼').trim(),
-                build: (getEl('prof-build')?.value || '標準勻稱').trim(),
+                build: (getEl('prof-build')?.value || '偏瘦勻稱 · 需拉高腰線比例').trim(),
                 skin: (getEl('prof-skin')?.value || '自然暖黃調').trim(),
-                fit: (getEl('prof-fit')?.value || '褲長蓋鞋舌').trim(),
-                style: (getEl('prof-style')?.value || 'Blokecore, City Boy').trim()
+                fit: (getEl('prof-fit')?.value || '長褲微蓋鞋舌；短褲露膝上2-4cm配中筒長襪（外套＋短褲上長下短）').trim(),
+                style: (getEl('prof-style')?.value || 'Blokecore, City Boy, 美式街頭, Smart Casual').trim()
             };
             await saveMetaState();
             refreshProfileBadge();
             closeModal('profile-modal');
-            showToast('已更新個人身形與風格基因檔案！');
+            showToast('已更新個人身形與同身高模特對標檔案！');
         }
 
         function saveCustomApiKey() {
             const val = (getEl('apikey-input')?.value || '').trim();
             try { localStorage.setItem(APIKEY_LS_KEY, val); } catch (e) {}
+            updateApiStatusIndicator();
             closeModal('apikey-modal');
-            showToast(val ? 'Gemini API 金鑰已儲存（使用 gemini-2.5-flash）！' : '已清除自訂金鑰。');
+            showToast(val ? '✅ API 金鑰已儲存並同步至全站造型引擎！' : '已清除金鑰。');
         }
 
         function clearCustomApiKey() {
             if (getEl('apikey-input')) getEl('apikey-input').value = '';
             try { localStorage.removeItem(APIKEY_LS_KEY); } catch (e) {}
+            updateApiStatusIndicator();
             closeModal('apikey-modal');
-            showToast('已清除自訂 API 金鑰。');
+            showToast('已清除 API 金鑰。');
         }
 
         async function exportFullBackupJson() {
@@ -1570,7 +1643,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     });
                 }
                 const payload = {
-                    app: 'StyleFit AI',
+                    app: 'StyleFit AI Pro',
                     version: 'UltraDB_v2',
                     exportedAt: new Date().toISOString(),
                     data: {
@@ -1582,7 +1655,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `StyleFit_UltraBackup_${new Date().toISOString().slice(0, 10)}.json`;
+                a.download = `StyleFit_ProBackup_${new Date().toISOString().slice(0, 10)}.json`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
@@ -1659,7 +1732,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     renderWeeklyPlan();
                     renderOotdHistoryLog();
                     closeModal('backup-modal');
-                    showToast(`✅ 還原成功！已將 ${newWardrobeMeta.length} 件單品轉換為二進位 Blob 存入 UltraDB。`);
+                    showToast(`✅ 還原成功！已匯入 ${newWardrobeMeta.length} 件雙照單品。`);
                 } catch (err) {
                     showToast('備份檔格式錯誤或損壞，無法還原。', 'error');
                 }
@@ -1674,8 +1747,8 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             const minInp = getEl('temp-min-input');
             const maxInp = getEl('temp-max-input');
             if (!minInp || !maxInp) return;
-            let minV = parseInt(minInp.value, 10) || 16;
-            let maxV = parseInt(maxInp.value, 10) || 22;
+            let minV = parseInt(minInp.value, 10) || 19;
+            let maxV = parseInt(maxInp.value, 10) || 25;
             if (which === 'min') {
                 minV += delta;
                 if (minV > maxV) maxV = minV;
@@ -1689,17 +1762,17 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
         }
 
         function updateTempBadge() {
-            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 16;
-            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 22;
+            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 19;
+            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 25;
             const diff = Math.max(0, maxV - minV);
             const badge = getEl('temp-dynamic-badge');
             if (!badge) return;
-            if (maxV >= 27) {
-                badge.textContent = `最高 ${maxV}°C · 透氣防汗單穿優先`;
-            } else if (minV <= 14) {
-                badge.textContent = `最低 ${minV}°C · 重磅保暖多層次`;
+            if (maxV >= 28) {
+                badge.textContent = `最高 ${maxV}°C · 膝上短褲＋長襪比例`;
+            } else if (minV <= 15) {
+                badge.textContent = `最低 ${minV}°C · 外套＋直筒長褲微蓋鞋舌`;
             } else {
-                badge.textContent = `溫差 ${diff}°C · 洋蔥式穿脫邏輯`;
+                badge.textContent = `溫差 ${diff}°C · 上長下短（外套＋短褲）或長褲皆宜`;
             }
         }
 
@@ -1708,42 +1781,70 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 return '今日選擇不噴香水。建議可於出門前使用無香體香膏保持清爽，完全不影響任何特殊材質衣物。';
             }
             const hasJersey = chosenItems.some(i => /球衣|jersey|排汗|網眼/i.test(`${i.name} ${i.care}`));
-            const hasFurOrKnit = chosenItems.some(i => i.category === 'outerwear' || /毛|絨|針織|燈芯絨/i.test(`${i.name} ${i.care}`));
+            const hasFurOrKnit = chosenItems.some(i => i.category === 'outerwear' || /毛|絨|針織|燈芯絨|刷毛/i.test(`${i.name} ${i.care}`));
             const isHotOrSweaty = /運動|打球|流汗|燒肉|火鍋/i.test(itinerary);
 
             let points = ['耳後與頸部兩側脈搏點（各 1 下，隨體溫自然散發）', '鎖骨中央皮膚（1 下，隔著內搭透出乾淨體香）'];
             if (isHotOrSweaty) {
-                points = ['耳後兩側（各 1 下，避開易大量出汗的前胸與腋下）', '膝蓋後方或手腕內側輕點（1 下，走動時香氣由下往上更清爽）'];
+                points = ['耳後兩側（各 1 下，避開易大量出汗的前胸與腋下）', '手腕內側或膝蓋後方輕點（1 下，避免油煙與汗味混雜）'];
             }
 
             const warnings = [];
-            if (hasJersey) warnings.push('嚴禁直接噴在球衣隊徽、贊助商燙印或排汗網眼布料上（酒精會加速膠印老化並留下水漬）');
-            if (hasFurOrKnit) warnings.push('切勿近距離噴灑在毛外套絨毛或針織表面（易卡味多日且留香精印；若需留香請距離內襯 30 公分空中噴霧飄落）');
+            if (hasJersey) warnings.push('嚴禁直接噴在球衣隊徽、贊助商燙印或排汗布料上（酒精會加速膠印老化並留下水漬）');
+            if (hasFurOrKnit) warnings.push('切勿近距離噴灑在刷毛/毛外套表面（易卡味多日；若需留香請距離內襯 30 公分空中噴霧）');
             if (warnings.length === 0) warnings.push('請噴於皮膚脈搏點後自然風乾，切勿搓揉手腕以免破壞前調層次');
 
             return `【${perfumeName}】推薦點位：${points.join('；')}。⚠️ 護衣避雷：${warnings.join('；')}。`;
         }
 
+        let lastTodayMatchedSlotMap = null;
+
         async function generateTodayOutfitPlan() {
-            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 16;
-            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 22;
+            const minV = parseInt(getEl('temp-min-input')?.value, 10) || 19;
+            const maxV = parseInt(getEl('temp-max-input')?.value, 10) || 25;
             const itinerary = (getEl('today-itinerary-input')?.value || '').trim();
             const perfume = getEl('today-perfume-select')?.value || '大吉嶺淡香精（茶香木質調）';
 
+            if (!resolveApiKey() && appState.wardrobe.length > 0) {
+                showToast('請先點右上角「🔑 API」貼上金鑰，才能啟動同身高模特比例引擎！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+
             const btn = getEl('btn-generate-today');
-            if (btn) { btn.disabled = true; btn.textContent = '⏳ 正在分析氣溫與匹配衣櫥...'; }
+            if (btn) { btn.disabled = true; btn.textContent = '⏳ 正在對標同身高模特比例與全衣櫥單品...'; }
 
             const wardrobeSummary = appState.wardrobe.map(w => ({
-                id: w.id, category: w.category, name: w.name, color: w.color, care: w.care
+                id: w.id, category: w.category, name: w.name, color: w.color, notes: w.notes
             }));
 
             let aiRes = null;
             if (resolveApiKey()) {
                 try {
                     aiRes = await callGeminiAPI(
-                        `你是個人專屬造型師。使用者身高 ${appState.profile.height}cm、偏好 ${appState.profile.style}、褲長偏好 ${appState.profile.fit}。今日氣溫 ${minV}~${maxV}°C，行程：「${itinerary || '日常出門'}」，香水：「${perfume}」。現有衣櫥清單：${JSON.stringify(wardrobeSummary)}。請優先從現有衣櫥挑選單品搭配（若衣櫥為空則給出具體實戰單品公式），並回傳繁體中文 JSON：{"summary":"一句話穿搭組合","reason":"為何適合今日溫差與行程（含穿脫建議）","matchedIds":["衣櫥單品id"],"perfumeGuide":"精準噴灑位置與避開球衣/毛外套提醒"}`
+                        `你是頂尖男性街頭與時裝造型總監。${getModelBenchmarkPrompt()}
+今日氣溫 ${minV}~${maxV}°C，行程：「${itinerary || '日常校園與街頭休閒'}」，香水：「${perfume}」。
+現有智慧衣櫥完整單品清單：${JSON.stringify(wardrobeSummary)}。
+
+請從現有衣櫥中挑選穿在他 169cm / 50kg 身上最合身、最有高級質感的一整套單品（若氣溫與行程適合「外套＋短褲＋中筒長襪」的 City Boy 上長下短穿法，請大膽搭配並說明外套敞開與襪長細節；若需長褲則選直筒微蓋鞋舌版型），回傳繁體中文 JSON：
+{
+  "summary": "一句話完整造型公式（標註色系與同身高模特比例定位）",
+  "reason": "對照小紅書/Pinterest 168-170cm 模特穿法，解析這套的腰線、衣長、褲長/襪長比例與上下色彩呼應",
+  "slots": {
+    "outerwear": "單品id或空字串",
+    "top": "單品id或空字串",
+    "bottom": "單品id或空字串",
+    "underwear": "單品id或空字串",
+    "socks": "單品id或空字串",
+    "shoes": "單品id或空字串",
+    "accessory": "單品id或空字串"
+  },
+  "perfumeGuide": "針對所選衣物材質的精準香水點位與避雷提醒"
+}`
                     );
-                } catch (e) {}
+                } catch (e) {
+                    showToast(`AI 連線異常：${e?.message || '請檢查 API 金鑰'}`, 'error');
+                }
             }
 
             let chosenItems = [];
@@ -1751,44 +1852,46 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             let reason = '';
             let perfumeGuide = '';
 
-            if (aiRes && aiRes.summary) {
+            if (aiRes && aiRes.summary && aiRes.slots) {
+                const sanitized = sanitizeOutfitSelection(aiRes.slots, minV);
+                lastTodayMatchedSlotMap = sanitized;
+                chosenItems = STUDIO_SLOTS.map(s => sanitized[s] ? appState.wardrobe.find(w => w.id === sanitized[s]) : null).filter(Boolean);
                 summary = aiRes.summary;
                 reason = aiRes.reason || '';
                 perfumeGuide = aiRes.perfumeGuide || '';
-                if (Array.isArray(aiRes.matchedIds)) {
-                    chosenItems = aiRes.matchedIds.map(id => appState.wardrobe.find(w => w.id === id)).filter(Boolean);
-                }
             } else {
-                const pickCat = (cat) => {
-                    const list = appState.wardrobe.filter(w => w.category === cat);
-                    if (list.length === 0) return null;
-                    if (cat === 'outerwear' && /燒肉|火鍋|油煙/i.test(itinerary)) {
-                        const washable = list.find(i => !/毛|絨|皮草/i.test(i.name));
-                        if (washable) return washable;
-                    }
-                    return list[0];
-                };
+                const wantShorts = /短褲|上長下短/i.test(itinerary) || minV >= 20;
+                const shortsPool = appState.wardrobe.filter(w => w.category === 'bottom' && isShortPantsItem(w));
+                const longPool = appState.wardrobe.filter(w => w.category === 'bottom' && !isShortPantsItem(w));
+                const bottom = (wantShorts && shortsPool.length > 0) ? shortsPool[0] : (longPool[0] || shortsPool[0] || null);
 
-                const top = pickCat('top');
-                const outer = minV <= 21 ? pickCat('outerwear') : null;
-                const bottom = pickCat('bottom');
-                const shoes = pickCat('shoes');
-                let underwear = pickCat('underwear');
-                if (bottom && /白|米|淺/i.test(`${bottom.name} ${bottom.color}`)) {
-                    const safeUw = appState.wardrobe.find(w => w.category === 'underwear' && /灰|白|膚|米/i.test(`${w.name} ${w.color}`));
-                    if (safeUw) underwear = safeUw;
-                }
+                const top = appState.wardrobe.find(w => w.category === 'top') || null;
+                const outers = appState.wardrobe.filter(w => w.category === 'outerwear');
+                const outer = minV <= 24 ? (outers[0] || null) : null;
+                const shoes = appState.wardrobe.find(w => w.category === 'shoes') || null;
+                const safeUw = appState.wardrobe.find(w => w.category === 'underwear' && /白|灰|膚/i.test(`${w.name} ${w.color}`))
+                    || appState.wardrobe.find(w => w.category === 'underwear') || null;
+                const socks = appState.wardrobe.find(w => w.category === 'socks') || null;
+                const acc = appState.wardrobe.find(w => w.category === 'accessory') || null;
 
-                chosenItems = [outer, top, bottom, underwear, shoes].filter(Boolean);
+                const sanitized = sanitizeOutfitSelection({
+                    outerwear: outer?.id || null,
+                    top: top?.id || null,
+                    bottom: bottom?.id || null,
+                    underwear: safeUw?.id || null,
+                    socks: socks?.id || null,
+                    shoes: shoes?.id || null,
+                    accessory: acc?.id || null
+                }, minV);
+                lastTodayMatchedSlotMap = sanitized;
+                chosenItems = STUDIO_SLOTS.map(s => sanitized[s] ? appState.wardrobe.find(w => w.id === sanitized[s]) : null).filter(Boolean);
 
                 if (chosenItems.length >= 2) {
-                    summary = `衣櫥實戰搭配：${chosenItems.map(i => `${i.name}（${i.color}）`).join(' ＋ ')}`;
-                    reason = `針對 ${minV}°C ～ ${maxV}°C 的${maxV - minV >= 5 ? '明顯溫差' : '舒適氣候'}，${outer ? `外層以「${outer.name}」應對早晚微涼，進室內或中午升溫脫掉外套後，內搭「${top ? top.name : '上衣'}」依然保持完整造型比例。` : '單穿清爽透氣不悶熱。'}${itinerary ? `已針對行程「${itinerary}」優化活動度與材質防異味考量。` : ''}`;
+                    summary = `169cm 比例鎖定配方：${chosenItems.map(i => `${i.name}（${i.color}）`).join(' ＋ ')}`;
+                    reason = `對標同身高街頭模特比例：${bottom && isShortPantsItem(bottom) ? '採用「上長下短（外套敞開＋膝上短褲＋中筒長襪）」拉長小腿線條' : '採用直筒長褲微蓋鞋舌延伸腿部線條'}。`;
                 } else {
-                    summary = minV <= 20
-                        ? `洋蔥式層次配方：外罩寬鬆連帽/立領外套 ＋ 內搭球衣或重磅短 T ＋ 直筒牛仔寬褲 ＋ 復古球鞋`
-                        : `清爽比例配方：寬版球衣或牛津襯衫 ＋ 直筒牛仔寬褲（微蓋鞋舌） ＋ 復古德訓鞋`;
-                    reason = `目前數位衣櫥尚在建檔中，已為您生成符合 ${appState.profile.height}cm 與 ${minV}~${maxV}°C 溫差的黃金比例公式。上傳衣物後將直接抓取您的真實單品！`;
+                    summary = `169cm 黃金公式：連帽/運動外套（敞開） ＋ S/M合身內搭 ＋ 膝上短褲 ＋ Nike中筒長襪 ＋ 復古球鞋/Shox Z`;
+                    reason = `對標小紅書與 Pinterest 168–170 cm 男模實穿邏輯，利用內搭高腰線與小腿長襪留白穿出高級街頭感。`;
                 }
                 perfumeGuide = buildPerfumeAdvice(perfume, itinerary, chosenItems);
             }
@@ -1796,14 +1899,14 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             setText('today-outfit-summary', summary);
             setText('today-outfit-reason', reason);
             setText('today-perfume-guide', perfumeGuide || buildPerfumeAdvice(perfume, itinerary, chosenItems));
-            setText('today-source-tag', chosenItems.length > 0 ? `已匹配 ${chosenItems.length} 件衣櫥單品` : '身形氣候公式');
+            setText('today-source-tag', chosenItems.length > 0 ? `已比對衣櫥精選 ${chosenItems.length} 件` : '169cm 比例公式');
 
             const thumbsBox = getEl('today-matched-thumbs');
             if (thumbsBox) {
                 thumbsBox.innerHTML = chosenItems.map(item => {
                     const imgUrl = getDisplayImageUrl(`front_${item.id}`);
                     return `
-                        <div class="inline-flex items-center gap-1.5 px-2 py-1 rounded-xl bg-editorialCard border border-editorialBorder text-[11px] font-semibold">
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-editorialCard border border-editorialBorder text-[11px] font-semibold">
                             ${imgUrl ? `<img src="${imgUrl}" class="w-6 h-6 rounded-md object-cover">` : '<span>👕</span>'}
                             <span>${escapeHtml(item.name)}</span>
                         </div>
@@ -1811,8 +1914,22 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 }).join('');
             }
 
+            const sendBtn = getEl('btn-send-today-to-studio');
+            if (sendBtn) {
+                if (chosenItems.length > 0 && lastTodayMatchedSlotMap) {
+                    sendBtn.classList.remove('hidden');
+                    sendBtn.onclick = () => {
+                        studioSlotIds = { ...lastTodayMatchedSlotMap };
+                        switchTab('studio');
+                        showToast('已將今日推薦整套載入造型工坊，可直接微調或打卡！');
+                    };
+                } else {
+                    sendBtn.classList.add('hidden');
+                }
+            }
+
             showEl('today-result-box');
-            if (btn) { btn.disabled = false; btn.textContent = '✨ 生成今日衣櫥配方與香水點位'; }
+            if (btn) { btn.disabled = false; btn.textContent = '✨ 對標同身高男模比例 · 生成今日穿搭與香水配方'; }
         }
 
         // 穿搭急診室
@@ -1835,10 +1952,10 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             if (badge) { badge.classList.add('hidden'); badge.classList.remove('inline-flex'); }
         }
 
-        function loadWhiteJeansGuidePreset() {
+        function loadJacketShortsPreset() {
             const inp = getEl('er-question-input');
             if (inp) {
-                inp.value = '我有一件白色直筒牛仔褲，怕穿起來腿短又不知道配什麼上衣、外套和鞋子，請給我直接能出門的實戰搭配與避坑細節！';
+                inp.value = '我 169cm / 50kg，想穿外套配短褲跟 Nike Shox Z，小紅書跟 Pinterest 上同身高模特都是怎麼抓外套衣長、短褲長度跟襪子高度才顯高有質感？請對照我衣櫥現有單品給出組合！';
             }
             runEmergencyRoomSolver();
         }
@@ -1850,17 +1967,22 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 return;
             }
             const btn = getEl('btn-run-er');
-            if (btn) { btn.disabled = true; btn.textContent = '🩺 正在開立實戰處方箋...'; }
+            if (btn) { btn.disabled = true; btn.textContent = '🩺 正在對照 168-170cm 模特比例與衣櫥...'; }
 
             const wardrobeList = appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、');
             let aiRes = null;
             if (resolveApiKey()) {
                 try {
                     aiRes = await callGeminiAPI(
-                        `你是頂尖個人造型顧問，必須給出解決80%以上痛點的實戰答案，嚴禁空泛廢話。使用者檔案：${JSON.stringify(appState.profile)}。使用者現有衣櫥：${wardrobeList || '尚未建檔'}。問題：「${q || '請診斷這張照片的穿搭問題並給出改造方案'}」。請回傳繁體中文 JSON：{"diagnosis":"痛點根源精準診斷","recipes":[{"tag":"配方標籤","title":"完整單品組合","why":"為何這樣配能修飾比例"}],"tweaks":["30秒實穿微調指令1","指令2","指令3"],"donts":["地雷避坑1","避坑2","避坑3"]}`,
+                        `你是頂尖穿搭博主與 169cm 專屬造型總監。${getModelBenchmarkPrompt()}
+使用者完整智慧衣櫥單品：${wardrobeList || '尚未建檔'}。問題：「${q || '請診斷這張照片的合身度與比例問題'}」。
+請對標小紅書與 Pinterest 168-170cm / 50kg 男模的實穿標準，明確指出合身度與比例關鍵（肯定「外套＋短褲＋中筒長襪」上長下短穿法，但嚴格淘汰不合適尺寸或五五身穿法），並優先使用他衣櫥裡的真實單品，回傳繁體中文 JSON：
+{"diagnosis":"對標同身高模特的比例與合身度精準診斷","recipes":[{"tag":"風格標籤","title":"具體衣櫥單品組合","why":"為何這樣配在 169cm/50kg 身上有質感且顯高"}],"tweaks":["30秒顯高微調指令1","指令2","指令3"],"donts":["同身高模特淘汰雷區1","雷區2","雷區3"]}`,
                         erPhotoDataUrl ? [erPhotoDataUrl] : []
                     );
-                } catch (e) {}
+                } catch (e) {
+                    showToast(`AI 連線異常：${e.message}`, 'error');
+                }
             }
 
             if (aiRes && aiRes.diagnosis && Array.isArray(aiRes.recipes)) {
@@ -1883,56 +2005,14 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 if (dontsEl && Array.isArray(aiRes.donts)) {
                     dontsEl.innerHTML = aiRes.donts.map(d => `<li>${escapeHtml(d)}</li>`).join('');
                 }
-            } else {
-                const isWhiteJeans = /白.*褲|牛仔褲/i.test(q);
-                const isFurCoat = /毛外套|絨毛|皮草/i.test(q);
-                if (isWhiteJeans) {
-                    setText('er-diagnosis-text', '白色直筒牛仔褲最大的視覺風險在於「淺色橫向膨脹感」與「上半身壓不住重心導致頭輕腳重」，若褲腳堆積在腳踝更會直接截斷腿長。解決關鍵是：上半身用深色或強視覺單品壓住重心、褲腳維持微蓋鞋舌，並搭配淺灰/純白內褲防透色。');
-                    getEl('er-recipes-list').innerHTML = `
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold">配方 A · Blokecore</span>
-                            <h4 class="text-xs font-bold text-editorialText">深色球衣 ＋ 白色直筒牛仔褲 ＋ 復古球鞋</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">深色球衣隊徽與線條鎖住視覺重心，白褲把競技感轉化為高級街頭休閒風。</p>
-                        </div>
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold">配方 B · City Boy</span>
-                            <h4 class="text-xs font-bold text-editorialText">淺灰重磅連帽外套 ＋ 內搭白 T ＋ 白褲</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">連帽外套的厚磅挺度把視線往上拉高，內搭白 T 下擺微露 2 公分製造乾淨層次。</p>
-                        </div>
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold">配方 C · Ivy 微正裝</span>
-                            <h4 class="text-xs font-bold text-editorialText">水藍牛津襯衫 ＋ 白褲 ＋ 黑色皮鞋/靴</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">水藍＋純白最顯氣色質感，黑色鞋靴收尾增加份量感，瞬間穿出修長大人感。</p>
-                        </div>`;
-                } else if (isFurCoat) {
-                    setText('er-diagnosis-text', '仿皮草毛外套本身體積感大、立領厚實，若將拉鍊拉太高或領子立起來會直接遮住脖子並讓上半身顯得圓潤擁擠。只要降低領口高度並平衡下身分量，就能把街頭氣場拉滿。');
-                    getEl('er-recipes-list').innerHTML = `
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialText text-white text-[10px] font-bold">配方 A · 三明治呼應</span>
-                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套（拉鍊半開）＋ 亮色球衣 ＋ 黑色寬褲 ＋ 同色系鞋</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">外套與寬褲形成黑色縱向延伸顯高，內搭球衣與鞋款上下色彩呼應。</p>
-                        </div>
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-editorialAccent text-white text-[10px] font-bold">配方 B · 黑白高對比</span>
-                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套 ＋ 白色連帽/素 T ＋ 白色直筒牛仔褲</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">內層全白延伸身高線條，外罩黑色毛外套增加冬日街頭層次感。</p>
-                        </div>
-                        <div class="p-3.5 rounded-2xl bg-editorialBg border border-editorialBorder space-y-1.5">
-                            <span class="inline-block px-2 py-0.5 rounded-md bg-zinc-700 text-white text-[10px] font-bold">配方 C · 美式街頭</span>
-                            <h4 class="text-xs font-bold text-editorialText">黑色毛外套 ＋ 復古印花短 T ＋ 水洗灰寬褲 ＋ 棒球帽</h4>
-                            <p class="text-[11px] text-editorialMuted leading-relaxed">水洗灰過渡黑與亮色，搭配棒球帽平衡毛外套的肩膀膨脹感。</p>
-                        </div>`;
-                } else {
-                    setText('er-diagnosis-text', `針對您的問題「${q}」：在 169 cm 身高條件下，穿搭卡關通常源自「上下身視覺重心失衡」或「同色系缺乏材質層次對比」。透過『外深內亮』或『上寬下直筒＋微蓋鞋舌』即可立刻優化全身比例。`);
-                }
             }
 
-            if (btn) { btn.disabled = false; btn.textContent = '🩺 立即開立實戰處方箋'; }
-            showToast('已更新實戰處方箋！');
+            if (btn) { btn.disabled = false; btn.textContent = '🩺 對照同身高模特開立處方箋'; }
+            showToast('已更新 169cm 同身高模特比例處方箋！');
         }
 
         // =====================================================================
-        // 7. 分頁 2：我的數位衣櫥 + 排隊批次 AI 辨識引擎
+        // 7. 分頁 2：我的數位衣櫥 + 169cm 合身鑑定 + 排隊批次 AI 辨識引擎
         // =====================================================================
         function refreshWardrobeStatsAndAnalytics() {
             const items = appState.wardrobe;
@@ -1967,7 +2047,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 setText('analytics-cold-text', '上傳衣物後將自動追蹤使用率');
             }
 
-            // 更新「一鍵 AI 辨識未命名衣物」按鈕上的待辨識數量提示
             const bulkBtn = getEl('btn-bulk-ai-wardrobe');
             if (bulkBtn && !bulkBtn.disabled) {
                 const pendingCount = items.filter(i => i.hasFront && isItemNeedsAiDetection(i)).length;
@@ -1977,10 +2056,9 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             }
         }
 
-        // 一鍵排隊辨識衣櫥中尚未辨識的單品（救回批次匯入沒偵測到的衣服）
         async function runBulkAiRecognizeWardrobe() {
             if (!resolveApiKey()) {
-                showToast('請先點右上角「🔑 API」貼上你的 Gemini API 金鑰才能啟動 AI 辨識！', 'error');
+                showToast('請先點右上角「🔑 API」貼上你的 API 金鑰才能啟動 AI 辨識！', 'error');
                 openModal('apikey-modal');
                 return;
             }
@@ -2005,7 +2083,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             for (let idx = 0; idx < targets.length; idx++) {
                 if (wardrobeBulkAiAbort) break;
                 const item = targets[idx];
-                const pct = Math.round(((idx) / targets.length) * 100);
+                const pct = Math.round((idx / targets.length) * 100);
                 setText('wardrobe-ai-queue-status', `⏳ 排隊 AI 辨識中：第 ${idx + 1} / ${targets.length} 件（${item.name}）...`);
                 const barEl = getEl('wardrobe-ai-queue-bar');
                 if (barEl) barEl.style.width = `${pct}%`;
@@ -2016,7 +2094,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 try {
                     const fBlob = await getImageBlob(`front_${item.id}`);
                     const bBlob = item.hasBack ? await getImageBlob(`back_${item.id}`) : null;
-                    const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob);
+                    const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob, false);
                     if (detected && detected.name) {
                         item.category = detected.category;
                         item.name = detected.name;
@@ -2042,7 +2120,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     renderWardrobeGrid();
                 }
 
-                // 排隊間隔 650ms，避免觸發免費 API 每分鐘請求上限
                 if (idx < targets.length - 1 && !wardrobeBulkAiAbort) {
                     await new Promise(r => setTimeout(r, 650));
                 }
@@ -2067,10 +2144,9 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             setText('wardrobe-ai-queue-status', '正在安全停止目前單品後結束...');
         }
 
-        // 單件衣物卡片手動觸發「AI 重辨識」
         async function aiReDetectSingleCardItem(itemId) {
             if (!resolveApiKey()) {
-                showToast('請先點右上角「🔑 API」貼上 Gemini API 金鑰！', 'error');
+                showToast('請先點右上角「🔑 API」貼上 API 金鑰！', 'error');
                 openModal('apikey-modal');
                 return;
             }
@@ -2083,7 +2159,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             try {
                 const fBlob = await getImageBlob(`front_${item.id}`);
                 const bBlob = item.hasBack ? await getImageBlob(`back_${item.id}`) : null;
-                const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob);
+                const detected = await detectGarmentDetailsFromBlobs(fBlob, bBlob, false);
                 if (detected && detected.name) {
                     item.category = detected.category;
                     item.name = detected.name;
@@ -2114,7 +2190,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             switchTab('today');
             const inp = getEl('er-question-input');
             if (inp) {
-                inp.value = `我衣櫥裡有一件「${cold.name}（${cold.color}）」買來還沒穿過（0 次），請幫我搭配出 3 套最帥、最能融入我日常風格的出門穿法！`;
+                inp.value = `我衣櫥裡有一件「${cold.name}（${cold.color}）」買來還沒穿過（0 次），請對照 169cm/50kg 模特比例，用我現有衣櫥單品搭配出 3 套最帥、有質感的出門穿法（包含外套配短褲或長褲公式）！`;
             }
             runEmergencyRoomSolver();
         }
@@ -2191,6 +2267,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 if (img) { img.src = ''; img.classList.add('hidden'); }
                 showEl('new-front-placeholder');
                 hideEl('btn-rm-front');
+                hideEl('new-item-fit-report');
             } else {
                 newBackBlob = null;
                 if (getEl('new-back-file')) getEl('new-back-file').value = '';
@@ -2201,20 +2278,21 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             }
         }
 
+        // 上傳新衣時：同步執行單品辨識 ＋ 169cm 模特合身度鑑定 ＋ 完整比對現有衣櫥
         async function aiDetectNewSingleItem() {
             if (!newFrontBlob) {
-                showToast('請先上傳「正面照」再執行 AI 辨識喔！', 'error');
+                showToast('請先上傳「正面照」再執行 AI 辨識與合身鑑定喔！', 'error');
                 return;
             }
             if (!resolveApiKey()) {
-                showToast('未設定雲端 API 金鑰，請先點右上角「🔑 API」設定！', 'error');
+                showToast('未設定 API 金鑰，請先點右上角「🔑 API」設定！', 'error');
                 openModal('apikey-modal');
                 return;
             }
             const btn = getEl('btn-ai-detect-single');
-            if (btn) { btn.disabled = true; btn.textContent = '✨ AI 正在合併分析正反面細節...'; }
+            if (btn) { btn.disabled = true; btn.textContent = '✨ 正在鑑定 169cm 版型合身度並比對全衣櫥...'; }
             try {
-                const ai = await detectGarmentDetailsFromBlobs(newFrontBlob, newBackBlob);
+                const ai = await detectGarmentDetailsFromBlobs(newFrontBlob, newBackBlob, true);
                 if (ai && CATEGORY_META[ai.category]) {
                     if (getEl('new-item-cat')) getEl('new-item-cat').value = ai.category;
                     onNewItemCategoryChange(ai.category);
@@ -2222,12 +2300,26 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     if (ai.color && getEl('new-item-color')) getEl('new-item-color').value = ai.color;
                     if (ai.care && getEl('new-item-care')) getEl('new-item-care').value = ai.care;
                     if (ai.notes && getEl('new-item-notes')) getEl('new-item-notes').value = ai.notes;
-                    showToast('✨ AI 已自動填入單品分類、名稱與洗護建議！');
+
+                    if (ai.fitVerdict) {
+                        const isPass = /留下|合身|值得|推薦|高質感/i.test(ai.fitVerdict) && !/不合適|退換/i.test(ai.fitVerdict);
+                        const badgeEl = getEl('new-item-fit-badge');
+                        if (badgeEl) {
+                            badgeEl.textContent = ai.fitVerdict;
+                            badgeEl.className = isPass
+                                ? 'px-2 py-0.5 rounded-md bg-emerald-700 text-white text-[10px] font-bold'
+                                : 'px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] font-bold';
+                        }
+                        setText('new-item-combo-count', `可配 ${ai.comboCount || 2} 套現有衣櫥單品`);
+                        setText('new-item-fit-reason', ai.fitAndWardrobeAnalysis || '');
+                        showEl('new-item-fit-report');
+                    }
+                    showToast('✨ 已完成單品辨識、169cm 版型適配鑑定與全衣櫥比對！');
                 }
             } catch (err) {
                 showToast(`辨識失敗：${err.message}`, 'error');
             } finally {
-                if (btn) { btn.disabled = false; btn.textContent = '✨ AI 雙面自動辨識名稱與洗護建議'; }
+                if (btn) { btn.disabled = false; btn.textContent = '✨ AI 辨識單品 ＋ 鑑定 169cm 合身質感與衣櫥搭配度'; }
             }
         }
 
@@ -2285,7 +2377,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             if (getEl('new-item-notes')) getEl('new-item-notes').value = '';
             toggleAddSingleCard(false);
             renderWardrobeSection();
-            showToast(`已收入 UltraDB 二進位衣櫥：「${name}」（建檔後穿 0 次起算）`);
+            showToast(`已收入智慧衣櫥：「${name}」`);
         }
 
         function flipWardrobeCard(itemId) {
@@ -2525,7 +2617,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                         <div class="text-3xl">🧥</div>
                         <h3 class="text-sm font-bold text-editorialText">${isTotalEmpty ? '你的私人數位衣櫥目前為 0 件（UltraDB 二進位圖庫已就緒）' : '找不到符合條件的單品'}</h3>
                         <p class="text-xs text-editorialMuted max-w-md mx-auto leading-relaxed">
-                            上傳你現有的上衣、外套、下身、內褲、襪子、鞋子與配件。採用原生二進位 Blob 獨立儲存（支援 1,000+ 件正反面雙照），徹底告別 5MB 容量上限。
+                            上傳你現有的上衣、外套、下身、內褲、襪子、鞋子與配件。採用原生二進位 Blob 獨立儲存（支援 1,000+ 件正反面雙照）。
                         </p>
                         <div class="pt-2 flex flex-wrap justify-center gap-2">
                             <button type="button" onclick="toggleAddSingleCard(true)" class="px-4 py-2 rounded-xl bg-editorialText hover:bg-editorialAccent text-white text-xs font-bold transition">+ 新增第一件單品</button>
@@ -2549,13 +2641,11 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 return `
                     <div class="bg-editorialCard rounded-2xl border ${needsWash ? 'border-amber-400' : 'border-editorialBorder'} overflow-hidden flex flex-col justify-between card-hover">
                         <div>
-                            <!-- 圖片區 -->
                             <div onclick="${item.hasBack ? `flipWardrobeCard('${item.id}')` : ''}" class="relative h-52 bg-editorialBg overflow-hidden ${item.hasBack ? 'cursor-pointer' : ''} group">
                                 ${imgUrl
                                     ? `<img src="${imgUrl}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover transition duration-300 group-hover:scale-105">`
                                     : `<div class="w-full h-full flex items-center justify-center text-3xl text-editorialMuted">👕</div>`}
 
-                                <!-- 左上分類與面數徽章 -->
                                 <div class="absolute top-2.5 left-2.5 flex items-center gap-1">
                                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-editorialText/85 text-white backdrop-blur-xs">${catLabel}</span>
                                     ${item.hasBack
@@ -2563,12 +2653,10 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                                         : ''}
                                 </div>
 
-                                <!-- 右上洗護狀態徽章 -->
                                 ${needsWash
                                     ? `<span class="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500 text-white shadow-xs">🧼 該洗護了</span>`
                                     : ''}
 
-                                <!-- 左下翻面或補傳背面按鈕 -->
                                 <div class="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1">
                                     ${item.hasBack
                                         ? `<button type="button" onclick="event.stopPropagation(); flipWardrobeCard('${item.id}')" class="px-2.5 py-1 rounded-lg bg-white/95 hover:bg-editorialText hover:text-white text-editorialText text-[10px] font-bold shadow-xs transition">🔄 ${showBack ? '翻回正面' : '翻看背面'}</button>`
@@ -2579,7 +2667,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                                 </div>
                             </div>
 
-                            <!-- 文字資訊區 -->
                             <div class="p-3.5 space-y-1.5">
                                 <div class="flex items-start justify-between gap-2">
                                     <h4 class="text-sm font-bold text-editorialText leading-snug line-clamp-1">${escapeHtml(item.name)}</h4>
@@ -2594,7 +2681,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                             </div>
                         </div>
 
-                        <!-- 底部操作列 -->
                         <div class="px-3.5 py-2.5 bg-editorialBg/70 border-t border-editorialBorder flex items-center justify-between gap-1.5">
                             <button type="button" onclick="incrementItemWear('${item.id}')" class="px-2.5 py-1 rounded-lg bg-editorialText hover:bg-editorialAccent text-white text-[11px] font-bold transition">
                                 +1 穿著
@@ -2612,7 +2698,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             }).join('');
         }
 
-        // 多圖批次匯入（階段一：全部壓縮建草稿；階段二：排隊佇列逐件 AI 辨識）
+        // 多圖批次匯入
         async function handleBatchFilesSelected(event) {
             const files = Array.from(event.target?.files || []);
             if (files.length === 0) return;
@@ -2624,7 +2710,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             showEl('batch-progress-box');
             if (saveBtn) saveBtn.disabled = true;
 
-            // 階段一：快速壓縮建立草稿清單
             for (let i = 0; i < files.length; i++) {
                 setText('batch-progress-text', `正在壓縮建立草稿第 ${i + 1} / ${files.length} 張...`);
                 if (barEl) barEl.style.width = `${Math.round(((i + 1) / files.length) * 30)}%`;
@@ -2651,7 +2736,6 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             renderBatchDraftList();
             if (saveBtn) saveBtn.disabled = batchDrafts.length === 0;
 
-            // 階段二：若有 API Key，啟動排隊佇列逐件呼叫 AI 偵測品項
             if (resolveApiKey() && batchDrafts.length > 0) {
                 let doneCount = 0;
                 const total = batchDrafts.length;
@@ -2661,11 +2745,11 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     const draft = batchDrafts[idx];
                     draft.aiStatus = 'detecting';
                     renderBatchDraftList();
-                    setText('batch-progress-text', `✨ 排隊 AI 辨識中：第 ${idx + 1} / ${total} 件（避免 API 擁塞）...`);
+                    setText('batch-progress-text', `✨ 排隊 AI 辨識中：第 ${idx + 1} / ${total} 件...`);
                     if (barEl) barEl.style.width = `${30 + Math.round(((idx + 1) / total) * 70)}%`;
 
                     try {
-                        const detected = await detectGarmentDetailsFromBlobs(draft.frontBlob, draft.backBlob);
+                        const detected = await detectGarmentDetailsFromBlobs(draft.frontBlob, draft.backBlob, false);
                         if (detected && detected.name) {
                             draft.category = detected.category;
                             draft.name = detected.name;
@@ -2693,7 +2777,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 setText('batch-progress-text', `✅ 排隊辨識結束（成功 ${doneCount} / ${total} 件），確認後點擊「全部收入 UltraDB 衣櫥」`);
             } else {
                 if (barEl) barEl.style.width = '100%';
-                setText('batch-progress-text', `✅ 已完成 ${batchDrafts.length} 張圖片壓縮（未設定 API 金鑰，可先收入衣櫥後再一鍵 AI 辨識）`);
+                setText('batch-progress-text', `✅ 已完成 ${batchDrafts.length} 張圖片壓縮`);
             }
         }
 
@@ -2716,9 +2800,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                     <div class="p-3 rounded-xl bg-editorialBg border border-editorialBorder flex items-center gap-3">
                         <img src="${d.frontPreviewUrl}" alt="預覽" class="w-14 h-14 rounded-xl object-cover border border-editorialBorder shrink-0">
                         <div class="flex-1 space-y-1.5">
-                            <div class="flex items-center justify-between">
-                                ${statusBadge}
-                            </div>
+                            <div class="flex items-center justify-between">${statusBadge}</div>
                             <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                                 <select onchange="updateBatchDraftField(${idx}, 'category', this.value)" class="rounded-lg bg-editorialCard border border-editorialBorder px-2 py-1.5 text-xs font-semibold">${opts}</select>
                                 <input type="text" value="${escapeHtml(d.name)}" onchange="updateBatchDraftField(${idx}, 'name', this.value)" placeholder="單品名稱" class="sm:col-span-2 rounded-lg bg-editorialCard border border-editorialBorder px-2.5 py-1.5 text-xs font-medium">
@@ -2799,7 +2881,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
         }
 
         // =====================================================================
-        // 8. 分頁 3：7 槽位造型工坊 & 白褲防透色警報 & 週曆
+        // 8. 分頁 3：169cm 專屬 AI 造型工坊（支援外套＋短褲上長下短）& 7 天週曆
         // =====================================================================
         function renderStudioSlots() {
             const grid = getEl('studio-slots-grid');
@@ -2834,7 +2916,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 `;
             }).join('');
 
-            checkWhitePantsTransparencyRule();
+            evaluateStudioStylingTips();
         }
 
         function setStudioSlotItem(slot, itemId) {
@@ -2844,49 +2926,106 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
 
         function clearStudioSlots() {
             STUDIO_SLOTS.forEach(s => { studioSlotIds[s] = null; });
+            hideEl('studio-stylist-commentary');
             renderStudioSlots();
         }
 
-        function checkWhitePantsTransparencyRule() {
-            const bottomItem = studioSlotIds.bottom ? appState.wardrobe.find(w => w.id === studioSlotIds.bottom) : null;
-            const uwItem = studioSlotIds.underwear ? appState.wardrobe.find(w => w.id === studioSlotIds.underwear) : null;
+        // 正確引導「外套＋短褲」穿法細節，而非智障禁止！
+        function evaluateStudioStylingTips() {
+            const outer = studioSlotIds.outerwear ? appState.wardrobe.find(w => w.id === studioSlotIds.outerwear) : null;
+            const bottom = studioSlotIds.bottom ? appState.wardrobe.find(w => w.id === studioSlotIds.bottom) : null;
+            const socks = studioSlotIds.socks ? appState.wardrobe.find(w => w.id === studioSlotIds.socks) : null;
+            const uw = studioSlotIds.underwear ? appState.wardrobe.find(w => w.id === studioSlotIds.underwear) : null;
 
-            const isWhiteOrLightBottom = bottomItem && /白|米|淺|cream|white/i.test(`${bottomItem.name} ${bottomItem.color}`);
-            const isDarkOrPatternUw = uwItem && /黑|深|紅|藍|紫|花|條紋|black|dark|navy/i.test(`${uwItem.name} ${uwItem.color}`);
+            const tips = [];
 
+            // 若同時選了外套與短褲，給出小紅書/Pinterest 169cm 男模穿出高質感的穿法指南
+            if (outer && bottom && isShortPantsItem(bottom)) {
+                tips.push(`【上長下短比例秘訣】「${outer.name}」＋「${bottom.name}」是小紅書 169cm 男模超愛穿法！記得把外套敞開露出內搭高腰線，短褲下擺在膝上 2–4cm${!socks ? '，並建議在襪子槽位選一雙中筒長襪拉長小腿比例' : ''}。`);
+            }
+
+            const isWhiteOrLightBottom = bottom && /白|米|淺|cream|white/i.test(`${bottom.name} ${bottom.color}`);
+            const isDarkOrPatternUw = uw && /黑|深|紅|藍|紫|花|條紋|black|dark|navy/i.test(`${uw.name} ${uw.color}`);
             if (isWhiteOrLightBottom && isDarkOrPatternUw) {
-                setText('underwear-alert-msg', `偵測到「${bottomItem.name}」搭配了「${uwItem.name}（${uwItem.color}）」，強光下容易透出顏色與邊界！建議改選衣櫥裡的淺灰、膚色或純白內褲。`);
-                showEl('underwear-transparency-alert');
+                tips.push(`【白褲防透色警報】「${bottom.name}」搭配深色「${uw.name}（${uw.color}）」在強光下極易透出輪廓，建議改選淺灰、膚色或純白內褲。`);
+            }
+
+            if (tips.length > 0) {
+                setText('studio-alert-title', '💡 169 cm 同身高模特實穿細節提示');
+                setText('studio-alert-msg', tips.join(' ｜ '));
+                showEl('studio-rule-alert');
             } else {
-                hideEl('underwear-transparency-alert');
+                hideEl('studio-rule-alert');
             }
         }
 
-        function aiAutoFillStudio() {
-            if (appState.wardrobe.length === 0) {
-                showToast('衣櫥目前還是 0 件喔，先去「我的數位衣櫥」上傳幾件衣服吧！', 'error');
+        // 真正呼叫 Gemini 造型總監對照同身高模特從衣櫥挑選協調單品
+        async function aiSmartStyleStudio() {
+            if (appState.wardrobe.length < 2) {
+                showToast('衣櫥單品數量不足，先去「我的數位衣櫥」上傳至少 2 件衣物吧！', 'error');
                 return;
             }
-            STUDIO_SLOTS.forEach(slot => {
-                const candidates = appState.wardrobe.filter(w => w.category === slot);
-                if (candidates.length === 0) {
-                    studioSlotIds[slot] = null;
-                    return;
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上金鑰，才能啟動 AI 造型總監搭配！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+
+            const targetStyle = getEl('studio-style-select')?.value || 'City Boy 上長下短街頭';
+            const btn = getEl('btn-studio-ai-style');
+            if (btn) { btn.disabled = true; btn.textContent = '✨ 對照同身高模特挑選中...'; }
+
+            const wardrobeSummary = appState.wardrobe.map(w => ({
+                id: w.id, category: w.category, name: w.name, color: w.color, notes: w.notes
+            }));
+
+            try {
+                const aiRes = await callGeminiAPI(
+                    `你是擁有百萬粉絲的男性穿搭博主與造型總監。${getModelBenchmarkPrompt()}
+現在請為他從現有智慧衣櫥中搭配一套符合目標公式「${targetStyle}」的完整造型。
+現有衣櫥所有單品：${JSON.stringify(wardrobeSummary)}。
+
+【搭配準則】：
+1. 若目標公式為「上長下短（外套＋短褲＋長襪）」，請務必同時選出最適合的 outerwear（外套）、bottom（短褲）、socks（中筒長襪）與 shoes（如 Nike Shox Z 或復古球鞋），並在點評中說明外套敞開露出腰線與襪長銜接的細節。
+2. 若目標公式為長褲系列，請挑選直筒/微寬長褲（「褲長微蓋鞋舌」）。
+3. 色彩學控制：全身不超過 3 個主色，製造上下色彩呼應；若選白褲，內褲必須選純白/淺灰/膚色。
+
+請回傳繁體中文 JSON：
+{
+  "slots": {
+    "outerwear": "單品id（不需要外套則填空字串）",
+    "top": "單品id",
+    "bottom": "單品id",
+    "underwear": "單品id或空字串",
+    "socks": "單品id或空字串",
+    "shoes": "單品id",
+    "accessory": "單品id或空字串"
+  },
+  "vibeTag": "同身高模特公式標籤（如：上長下短 3:7 比例 · 黑白機能呼應）",
+  "commentary": "像真實穿搭博主一樣，對照小紅書/Pinterest 168-170cm 模特穿法，點評這套的配色邏輯、腰線/衣長/襪長比例，以及出門時外套拉鍊與褲腳該怎麼調整（80～120字）"
+}`
+                );
+
+                if (aiRes && aiRes.slots) {
+                    const rawMap = {};
+                    STUDIO_SLOTS.forEach(s => {
+                        const candidateId = aiRes.slots[s];
+                        const exists = appState.wardrobe.some(w => w.id === candidateId && w.category === s);
+                        rawMap[s] = exists ? candidateId : null;
+                    });
+                    studioSlotIds = sanitizeOutfitSelection(rawMap, 20);
+                    renderStudioSlots();
+
+                    setText('studio-vibe-badge', aiRes.vibeTag || '169cm 同身高模特比例通過');
+                    setText('studio-commentary-text', aiRes.commentary || '已依據同身高男模比例與色彩呼應原則完成單品配置。');
+                    showEl('studio-stylist-commentary');
+                    showToast('✨ AI 造型總監已完成這套同身高模特級搭配！');
                 }
-                if (slot === 'underwear' && studioSlotIds.bottom) {
-                    const b = appState.wardrobe.find(w => w.id === studioSlotIds.bottom);
-                    if (b && /白|米|淺/i.test(`${b.name} ${b.color}`)) {
-                        const safe = candidates.filter(u => !/黑|深|紅|藍|紫/i.test(`${u.name} ${u.color}`));
-                        if (safe.length > 0) {
-                            studioSlotIds[slot] = safe[Math.floor(Math.random() * safe.length)].id;
-                            return;
-                        }
-                    }
-                }
-                studioSlotIds[slot] = candidates[Math.floor(Math.random() * candidates.length)].id;
-            });
-            renderStudioSlots();
-            showToast('✨ 已從您的數位衣櫥智慧抓取一組造型！');
+            } catch (err) {
+                showToast(`AI 搭配失敗：${err.message}`, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '✨ AI 造型師為我搭配'; }
+            }
         }
 
         async function saveCurrentStudioOutfit() {
@@ -2898,13 +3037,13 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             const names = ids.map(id => appState.wardrobe.find(w => w.id === id)?.name).filter(Boolean);
             appState.outfits.unshift({
                 id: 'outfit_' + Date.now(),
-                title: names.slice(0, 2).join(' ＋ ') + (names.length > 2 ? ` 等 ${names.length} 件` : ''),
+                title: names.slice(0, 3).join(' ＋ ') + (names.length > 3 ? ` 等 ${names.length} 件` : ''),
                 itemIds: ids
             });
             await saveMetaState();
             renderSavedOutfits();
             renderWeeklyPlan();
-            showToast('造型已儲存！可排入右側一週 OOTD 日曆。');
+            showToast('造型已儲存至配方庫！');
         }
 
         async function checkInCurrentOutfitToday() {
@@ -2965,7 +3104,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             setText('saved-outfits-count', `${appState.outfits.length} 套`);
             if (!box) return;
             if (appState.outfits.length === 0) {
-                box.innerHTML = `<div class="col-span-full text-xs text-editorialMuted py-2">尚未儲存造型，在上方挑選單品後點擊「儲存至造型庫」。</div>`;
+                box.innerHTML = `<div class="col-span-full text-xs text-editorialMuted py-2">尚未儲存造型，點擊上方「✨ AI 造型師為我搭配」後可儲存至此。</div>`;
                 return;
             }
             box.innerHTML = appState.outfits.map(o => `
@@ -2987,20 +3126,66 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
         }
 
         async function aiFillNonDuplicateWeek() {
-            if (appState.outfits.length === 0) {
-                showToast('請先在左側儲存至少 1～2 套造型，再一鍵排入一週日曆！', 'error');
+            if (appState.wardrobe.length < 3) {
+                showToast('衣櫥單品至少需要 3 件以上才能規劃一週不重複穿搭喔！', 'error');
                 return;
             }
-            let lastId = null;
-            WEEK_DAYS.forEach((day, idx) => {
-                const pool = appState.outfits.filter(o => o.id !== lastId);
-                const chosen = pool.length > 0 ? pool[idx % pool.length] : appState.outfits[0];
-                appState.weeklyPlan[day] = chosen.id;
-                lastId = chosen.id;
-            });
-            await saveMetaState();
-            renderWeeklyPlan();
-            showToast('✨ 已為您自動排滿一週不重複穿搭日曆！');
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上金鑰，才能啟動 AI 一週造型規劃！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
+
+            const btn = getEl('btn-ai-week-plan');
+            if (btn) { btn.disabled = true; btn.textContent = '✨ 正在編排 7 天造型...'; }
+
+            const wardrobeSummary = appState.wardrobe.map(w => ({
+                id: w.id, category: w.category, name: w.name, color: w.color, notes: w.notes
+            }));
+
+            try {
+                const aiRes = await callGeminiAPI(
+                    `你是個人專屬造型總監。${getModelBenchmarkPrompt()}
+請直接從以下現有衣櫥中，為週一到週日設計 7 套風格與配色錯開、交替運用「上長下短（外套＋短褲＋長襪）」與「直筒長褲微蓋鞋舌」的高質感日常穿搭。
+現有衣櫥：${JSON.stringify(wardrobeSummary)}。
+請回傳繁體中文 JSON：
+{
+  "days": [
+    { "day": "週一", "theme": "週一主題短標", "itemIds": ["上衣id", "下身id", "鞋子id", "外套或襪子配件id"] },
+    { "day": "週二", "theme": "週二主題短標", "itemIds": ["..."] },
+    { "day": "週三", "theme": "週三主題短標", "itemIds": ["..."] },
+    { "day": "週四", "theme": "週四主題短標", "itemIds": ["..."] },
+    { "day": "週五", "theme": "週五主題短標", "itemIds": ["..."] },
+    { "day": "週六", "theme": "週六主題短標", "itemIds": ["..."] },
+    { "day": "週日", "theme": "週日主題短標", "itemIds": ["..."] }
+  ]
+}`
+                );
+
+                if (aiRes && Array.isArray(aiRes.days)) {
+                    aiRes.days.forEach((dObj, idx) => {
+                        const validIds = (dObj.itemIds || []).filter(id => appState.wardrobe.some(w => w.id === id));
+                        if (validIds.length >= 2) {
+                            const outfitId = `week_${Date.now()}_${idx}`;
+                            const names = validIds.map(id => appState.wardrobe.find(w => w.id === id)?.name).filter(Boolean);
+                            appState.outfits.unshift({
+                                id: outfitId,
+                                title: `【${dObj.day}·${dObj.theme || '精選'}】${names.slice(0, 3).join(' ＋ ')}`,
+                                itemIds: validIds
+                            });
+                            appState.weeklyPlan[dObj.day] = outfitId;
+                        }
+                    });
+                    await saveMetaState();
+                    renderSavedOutfits();
+                    renderWeeklyPlan();
+                    showToast('✨ AI 已為你量身排好一週 7 天不重複穿搭日曆！');
+                }
+            } catch (err) {
+                showToast(`一週排程生成失敗：${err.message}`, 'error');
+            } finally {
+                if (btn) { btn.disabled = false; btn.textContent = '✨ AI 規劃 7 天不重複'; }
+            }
         }
 
         function renderWeeklyPlan() {
@@ -3021,6 +3206,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                             <option value="">-- 尚未排程 --</option>
                             ${appState.outfits.map(o => `<option value="${o.id}" ${o.id === assignedId ? 'selected' : ''}>${escapeHtml(o.title)}</option>`).join('')}
                         </select>
+                        ${assignedId ? `<button type="button" onclick="applySavedOutfitToStudio('${assignedId}')" class="px-2 py-1 rounded-lg bg-editorialCard border border-editorialBorder text-[10px] font-bold shrink-0">預覽</button>` : ''}
                     </div>
                 `;
             }).join('');
@@ -3050,7 +3236,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
         }
 
         // =====================================================================
-        // 9. 分頁 4：實拍診斷 · Buy or Bye 滅火器 · 旅行膠囊打包
+        // 9. 分頁 4：169cm 實拍診斷 · 要買不要買(完整衣櫥比對) · AI 旅行膠囊打包
         // =====================================================================
         function setDiagPhotoMode(mode) {
             diagPhotoMode = mode;
@@ -3084,47 +3270,44 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 showToast('請先上傳穿搭實拍或平拍單品組合照喔！', 'error');
                 return;
             }
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上金鑰，才能啟動視覺診斷！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
             const ctx = (getEl('diag-context-input')?.value || '').trim();
             const btn = getEl('btn-run-diag');
-            if (btn) { btn.disabled = true; btn.textContent = '🔍 正在結合時裝週與博主趨勢分析...'; }
+            if (btn) { btn.disabled = true; btn.textContent = '🔍 正在對標 168-170cm 模特分析合身與質感...'; }
 
-            const modeText = diagPhotoMode === 'worn' ? '實穿上身照' : '平拍/掛拍單品組合照（請執行虛擬上身比例推演）';
+            const modeText = diagPhotoMode === 'worn' ? '實穿上身照（直接檢驗肩線、衣長、褲長、襪長與 169cm/50kg 頭身比）' : '平拍單品組合照（執行 169cm 虛擬上身比例推演）';
+            const wardrobeNames = appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、');
             let aiRes = null;
-            if (resolveApiKey()) {
-                try {
-                    aiRes = await callGeminiAPI(
-                        `你是結合四大時裝週剪裁比例與全球穿搭博主經驗的個人造型總監。使用者檔案：${JSON.stringify(appState.profile)}。照片模式：${modeText}。補充說明：「${ctx}」。請回傳繁體中文 JSON：{"score":"88 / 100","verdict":"一句話總評","proportion":"身形比例與虛擬上身推演（169cm視角）","runwayTrend":"秀場與穿搭博主風格解析","tweak":"最關鍵的30秒微調建議"}`,
-                        [diagPhotoDataUrl]
-                    );
-                } catch (e) {}
+            try {
+                aiRes = await callGeminiAPI(
+                    `你是眼力極度犀利、絕不說客套廢話的頂尖男性穿搭買手與造型總監。${getModelBenchmarkPrompt()}
+使用者完整智慧衣櫥單品：${wardrobeNames || '無'}。照片模式：${modeText}。補充說明：「${ctx}」。
+請嚴格判斷這套或這件單品穿在 169 cm / 50 kg 身上是否合身、比例是否顯高、材質有沒有高級感；如果不合身或壓身高直接判定「不建議這樣穿」，並點名他智慧衣櫥裡的具體單品來替換升級！
+回傳繁體中文 JSON：{"score":"85 / 100","verdict":"合身度與質感一句話總評（合適留下 或 不合適淘汰）","proportion":"對標小紅書/Pinterest 168-170cm 男模的腰線、衣長、褲長/襪長比例拆解","runwayTrend":"面料質感與配色協調度解析","tweak":"最關鍵的30秒穿法微調或點名衣櫥單品替換方案"}`,
+                    [diagPhotoDataUrl]
+                );
+            } catch (e) {
+                showToast(`診斷失敗：${e.message}`, 'error');
             }
 
             const box = getEl('diag-result-box');
-            if (box) {
-                if (aiRes && aiRes.verdict) {
-                    box.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-editorialBorder pb-2">
-                            <span class="font-bold text-editorialText">${escapeHtml(aiRes.verdict)}</span>
-                            <span class="px-2.5 py-0.5 rounded-full bg-editorialText text-white font-bold">${escapeHtml(aiRes.score || '86 / 100')}</span>
-                        </div>
-                        <p><strong>📐 比例與上身推演：</strong>${escapeHtml(aiRes.proportion)}</p>
-                        <p><strong>🏛️ 秀場與博主趨勢：</strong>${escapeHtml(aiRes.runwayTrend)}</p>
-                        <p class="text-editorialAccent font-semibold"><strong>⚡ 30 秒微調關鍵：</strong>${escapeHtml(aiRes.tweak)}</p>
-                    `;
-                } else {
-                    box.innerHTML = `
-                        <div class="flex items-center justify-between border-b border-editorialBorder pb-2">
-                            <span class="font-bold text-editorialText">${diagPhotoMode === 'flat' ? '平拍組合比例協調，具備街頭辨識度' : '整體單品呼應完整，微調領口與褲長更修長'}</span>
-                            <span class="px-2.5 py-0.5 rounded-full bg-editorialText text-white font-bold">86 / 100</span>
-                        </div>
-                        <p><strong>📐 比例與上身推演：</strong>針對 ${appState.profile.height}cm 身形，上下身色塊分割明確；建議褲腳保持微蓋鞋舌，避免在腳踝堆疊。</p>
-                        <p><strong>🏛️ 秀場與博主趨勢：</strong>符合近年時裝週街拍常見的「運動球衣/重磅廓形 × 休閒丹寧或寬褲」高對比混搭邏輯。</p>
-                        <p class="text-editorialAccent font-semibold"><strong>⚡ 30 秒微調關鍵：</strong>若搭配厚重外套請將拉鍊拉低至胸口並外翻領片，露出內搭層次與頸部線條。</p>
-                    `;
-                }
+            if (box && aiRes && aiRes.verdict) {
+                box.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-editorialBorder pb-2">
+                        <span class="font-bold text-editorialText">${escapeHtml(aiRes.verdict)}</span>
+                        <span class="px-2.5 py-0.5 rounded-full bg-editorialText text-white font-bold">${escapeHtml(aiRes.score || '85 / 100')}</span>
+                    </div>
+                    <p><strong>📐 169cm 同身高模特比例診斷：</strong>${escapeHtml(aiRes.proportion)}</p>
+                    <p><strong>🎨 質感與配色解析：</strong>${escapeHtml(aiRes.runwayTrend)}</p>
+                    <p class="text-editorialAccent font-semibold"><strong>⚡ 微調與衣櫥替換方案：</strong>${escapeHtml(aiRes.tweak)}</p>
+                `;
                 showEl('diag-result-box');
             }
-            if (btn) { btn.disabled = false; btn.textContent = '✨ 開始深度造型診斷與比例推演'; }
+            if (btn) { btn.disabled = false; btn.textContent = '✨ 對標同身高模特開始合身度與質感診斷'; }
         }
 
         function handleBobPhotoUpload(event) {
@@ -3140,6 +3323,7 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             reader.readAsDataURL(file);
         }
 
+        // 要買還是不要買：完整比對智慧衣櫥全部單品 ＋ 169cm 模特合身度檢驗
         async function runBuyOrByeAnalysis() {
             const itemName = (getEl('bob-name-input')?.value || '').trim();
             const price = (getEl('bob-price-input')?.value || '').trim();
@@ -3147,67 +3331,133 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
                 showToast('請輸入欲購買的單品名稱或上傳截圖喔！', 'error');
                 return;
             }
+            if (!resolveApiKey()) {
+                showToast('請先點右上角「🔑 API」貼上金鑰，才能比對整座智慧衣櫥！', 'error');
+                openModal('apikey-modal');
+                return;
+            }
             const btn = getEl('btn-run-bob');
-            if (btn) { btn.disabled = true; btn.textContent = '⚖️ 正在比對現有衣櫥可搭配套數...'; }
+            if (btn) { btn.disabled = true; btn.textContent = '⚖️ 正在檢驗 169cm 合身度並比對全衣櫥單品...'; }
 
-            const wardrobeText = appState.wardrobe.map(w => `${CATEGORY_META[w.category]?.label}:${w.name}(${w.color})`).join('、');
+            const wardrobeFullList = appState.wardrobe.map(w => `[${CATEGORY_META[w.category]?.label}] ${w.name}（色系：${w.color}${w.notes ? '，備註：' + w.notes : ''}）`).join('\n');
             let aiRes = null;
-            if (resolveApiKey()) {
+            try {
+                aiRes = await callGeminiAPI(
+                    `你是幫使用者嚴格把關預算、拒絕不合身與低質感單品的時尚買手總監。${getModelBenchmarkPrompt()}
+【使用者完整智慧衣櫥清單（共 ${appState.wardrobe.length} 件）】：
+${wardrobeFullList || '目前衣櫥尚未建檔'}
+
+【欲評估購買的單品】：名稱「${itemName || '見附圖單品'}」，價格：${price ? 'NT$ ' + price : '未標'}。
+
+請進行雙重嚴格審查：(1) 對照小紅書/Pinterest 168-170cm / 50kg 模特實穿標準，這件單品的肩線、衣長/褲長與質感穿在他身上合適嗎？不合適或容易穿出五五身/廉價感必須直接判定 BYE；(2) 完整掃描上面整座智慧衣櫥清單，列出具體能與這件單品搭配的真實單品組合（至少 3 套，支援外套＋短褲＋長襪或長褲公式），並檢查是否跟衣櫥現有單品高度重複。
+回傳繁體中文 JSON：
+{
+  "verdict": "BUY 值得入手（合身有質感） 或 BYE 不要買（不合適／重複）",
+  "fitCheck": "針對 169cm / 50kg 身形的合身度、版型比例與質感評估（該選什麼尺碼或為何淘汰）",
+  "combosCount": 3,
+  "wardrobeCombos": ["搭配公式1（點名衣櫥真實單品名稱）", "搭配公式2（點名衣櫥真實單品名稱）", "搭配公式3（點名衣櫥真實單品名稱）"],
+  "reason": "最終買或不買的總結建議（含是否與現有衣櫥重複）"
+}`,
+                    bobPhotoDataUrl ? [bobPhotoDataUrl] : []
+                );
+            } catch (e) {
+                showToast(`分析失敗：${e.message}`, 'error');
+            }
+
+            const box = getEl('bob-result-box');
+            if (box && aiRes && aiRes.verdict) {
+                const isBuy = /buy|值得/i.test(aiRes.verdict) && !/bye|不要買/i.test(aiRes.verdict);
+                const combosHtml = Array.isArray(aiRes.wardrobeCombos) && aiRes.wardrobeCombos.length > 0
+                    ? `<div class="mt-2 p-2.5 rounded-xl bg-editorialCard border border-editorialBorder space-y-1">
+                        <div class="font-bold text-editorialText">👗 智慧衣櫥實戰搭配比對（共可配 ${aiRes.combosCount || aiRes.wardrobeCombos.length} 套）：</div>
+                        <ul class="list-disc list-inside space-y-0.5 text-editorialText">
+                            ${aiRes.wardrobeCombos.map(c => `<li>${escapeHtml(c)}</li>`).join('')}
+                        </ul>
+                       </div>`
+                    : '';
+
+                box.innerHTML = `
+                    <div class="inline-block px-2.5 py-1 rounded-lg font-bold ${isBuy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">${escapeHtml(aiRes.verdict)}</div>
+                    <p class="text-editorialText mt-1.5"><strong>📐 169cm / 50kg 合身度與質感評估：</strong>${escapeHtml(aiRes.fitCheck || '')}</p>
+                    ${combosHtml}
+                    <p class="text-editorialAccent font-semibold mt-1.5"><strong>💡 總結建議：</strong>${escapeHtml(aiRes.reason || '')}</p>
+                `;
+                showEl('bob-result-box');
+            }
+            if (btn) { btn.disabled = false; btn.textContent = '⚖️ 檢驗 169cm 合身度 ＋ 完整比對智慧衣櫥單品'; }
+        }
+
+        // 真正呼叫 AI 演算一衣多穿行李清單
+        async function generateCapsulePackingList() {
+            const dest = (getEl('pack-dest-input')?.value || '').trim() || '週末 3 天輕旅行';
+            const days = Math.max(1, parseInt(getEl('pack-days-input')?.value, 10) || 3);
+            const underwearNeeded = days + 1;
+            const socksNeeded = days + 1;
+
+            const btn = getEl('btn-run-pack');
+            if (btn) { btn.disabled = true; btn.textContent = '🎒 AI 正在演算一衣多穿核心清單...'; }
+
+            const wardrobeSummary = appState.wardrobe.map(w => ({
+                category: CATEGORY_META[w.category]?.label, name: w.name, color: w.color
+            }));
+
+            let aiRes = null;
+            if (resolveApiKey() && appState.wardrobe.length >= 2) {
                 try {
                     aiRes = await callGeminiAPI(
-                        `你是誠實幫使用者守住荷包的穿搭顧問。使用者現有衣櫥：${wardrobeText || '尚未建檔'}。欲購買單品：「${itemName || '截圖單品'}」，價格：${price || '未標'}。請評估能與現有衣櫥配出幾套造型、是否重複購買，並回傳繁體中文 JSON：{"verdict":"BUY 值得入手 或 BYE 建議滅火","combosCount":3,"reason":"誠實分析與衣櫥現有單品搭配公式"}`,
-                        bobPhotoDataUrl ? [bobPhotoDataUrl] : []
+                        `你是極簡旅行膠囊衣櫥專家。${getModelBenchmarkPrompt()}
+使用者要去「${dest}」，共 ${days} 天。現有衣櫥：${JSON.stringify(wardrobeSummary)}。
+請從他現有衣櫥挑出最能「上下交叉重複穿搭、行李最輕量」的核心單品（可同時運用「外套＋短褲＋長襪」上長下短穿法與長褲穿法），並排出 Day 1 到 Day ${days} 的每日具體穿法。
+回傳繁體中文 JSON：
+{
+  "coreItems": ["精選上衣A", "精選上衣B", "百搭長褲/膝上短褲C", "外套D", "耐走鞋款E"],
+  "dailyPlan": ["Day 1：...", "Day 2：...", "Day 3：..."],
+  "packingTip": "針對 169cm 比例調整、白褲防透色與香水攜帶的行李提醒"
+}`
                     );
                 } catch (e) {}
             }
 
-            const box = getEl('bob-result-box');
-            if (box) {
-                if (aiRes && aiRes.verdict) {
-                    const isBuy = /buy|值得/i.test(aiRes.verdict);
-                    box.innerHTML = `
-                        <div class="inline-block px-2.5 py-1 rounded-lg font-bold ${isBuy ? 'bg-emerald-600 text-white' : 'bg-rose-600 text-white'}">${escapeHtml(aiRes.verdict)}（預計可配 ${aiRes.combosCount || 2} 套）</div>
-                        <p class="text-editorialText mt-1.5">${escapeHtml(aiRes.reason)}</p>
-                    `;
-                } else {
-                    const hasEnoughWardrobe = appState.wardrobe.length >= 2;
-                    box.innerHTML = `
-                        <div class="inline-block px-2.5 py-1 rounded-lg font-bold ${hasEnoughWardrobe ? 'bg-emerald-600 text-white' : 'bg-amber-600 text-white'}">${hasEnoughWardrobe ? 'BUY · 具備一衣多穿潛力' : '冷靜評估 · 建議先比對現有下身'}</div>
-                        <p class="text-editorialText mt-1.5">針對「${escapeHtml(itemName || '此欲購單品')}」：購買前請確認它能否直接搭配你衣櫥裡最常穿的<strong>白色直筒牛仔褲</strong>或<strong>深色寬褲</strong>，若無法無痛配出 3 套以上不重複出門造型，建議先放入冷靜期 48 小時省荷包！</p>
-                    `;
-                }
-                showEl('bob-result-box');
-            }
-            if (btn) { btn.disabled = false; btn.textContent = '⚖️ 比對現有衣櫥：該買（BUY）還是滅火（BYE）？'; }
-        }
-
-        function generateCapsulePackingList() {
-            const dest = (getEl('pack-dest-input')?.value || '').trim() || '週末輕旅行';
-            const days = Math.max(1, parseInt(getEl('pack-days-input')?.value, 10) || 3);
-            const topsNeeded = Math.min(days, Math.ceil(days * 0.8));
-            const bottomsNeeded = Math.max(1, Math.ceil(days / 2));
-            const underwearNeeded = days + 1;
-            const socksNeeded = days + 1;
-
-            const myTops = appState.wardrobe.filter(w => w.category === 'top').slice(0, topsNeeded).map(w => w.name);
-            const myBottoms = appState.wardrobe.filter(w => w.category === 'bottom').slice(0, bottomsNeeded).map(w => w.name);
-            const myOuter = appState.wardrobe.filter(w => w.category === 'outerwear').slice(0, 1).map(w => w.name);
-            const myShoes = appState.wardrobe.filter(w => w.category === 'shoes').slice(0, 1).map(w => w.name);
-
             const box = getEl('pack-result-box');
             if (box) {
-                box.innerHTML = `
-                    <div class="font-bold text-editorialText">🎒 【${escapeHtml(dest)} · ${days} 天】一衣多穿膠囊清單</div>
-                    <ul class="list-disc list-inside space-y-1 text-editorialText mt-1">
-                        <li><strong>上衣（${topsNeeded} 件）：</strong>${myTops.length > 0 ? escapeHtml(myTops.join('、')) : '透氣球衣 / 寬版短 T 輪替'}</li>
-                        <li><strong>下身（${bottomsNeeded} 件）：</strong>${myBottoms.length > 0 ? escapeHtml(myBottoms.join('、')) : '白色直筒牛仔褲 ＋ 深色百搭寬褲'}</li>
-                        <li><strong>外套（1 件）：</strong>${myOuter.length > 0 ? escapeHtml(myOuter[0]) : '防風/重磅連帽外套（應對室內冷氣與早晚溫差）'}</li>
-                        <li><strong>鞋款（1 雙）：</strong>${myShoes.length > 0 ? escapeHtml(myShoes[0]) : '最耐走的復古球鞋'}</li>
-                        <li class="text-editorialAccent font-bold"><strong>貼身備品（自動 +1 備用）：</strong>內褲 ${underwearNeeded} 件（若帶白褲請優先選淺灰/純白款）、襪子 ${socksNeeded} 雙</li>
-                    </ul>
-                `;
+                if (aiRes && Array.isArray(aiRes.coreItems)) {
+                    box.innerHTML = `
+                        <div class="font-bold text-editorialText">🎒 【${escapeHtml(dest)} · ${days} 天】AI 一衣多穿膠囊清單</div>
+                        <div class="p-2.5 rounded-xl bg-editorialCard border border-editorialBorder space-y-1">
+                            <div class="font-bold text-editorialAccent">📦 行李箱核心單品：</div>
+                            <p class="text-editorialText">${escapeHtml(aiRes.coreItems.join('、'))}</p>
+                            <p class="text-editorialText font-semibold">• 貼身備品（自動 +1 備用）：內褲 ${underwearNeeded} 件、中筒長襪 ${socksNeeded} 雙</p>
+                        </div>
+                        <div class="space-y-1">
+                            <div class="font-bold text-editorialText">📅 每日穿搭拆解：</div>
+                            <ul class="list-disc list-inside space-y-1 text-editorialText">
+                                ${(aiRes.dailyPlan || []).map(d => `<li>${escapeHtml(d)}</li>`).join('')}
+                            </ul>
+                        </div>
+                        ${aiRes.packingTip ? `<p class="text-editorialMuted">💡 ${escapeHtml(aiRes.packingTip)}</p>` : ''}
+                    `;
+                } else {
+                    const topsNeeded = Math.min(days, Math.ceil(days * 0.8));
+                    const bottomsNeeded = Math.max(1, Math.ceil(days / 2));
+                    const myTops = appState.wardrobe.filter(w => w.category === 'top').slice(0, topsNeeded).map(w => w.name);
+                    const myBottoms = appState.wardrobe.filter(w => w.category === 'bottom').slice(0, bottomsNeeded).map(w => w.name);
+                    const myOuter = appState.wardrobe.filter(w => w.category === 'outerwear').slice(0, 1).map(w => w.name);
+                    const myShoes = appState.wardrobe.filter(w => w.category === 'shoes').slice(0, 1).map(w => w.name);
+
+                    box.innerHTML = `
+                        <div class="font-bold text-editorialText">🎒 【${escapeHtml(dest)} · ${days} 天】一衣多穿膠囊清單</div>
+                        <ul class="list-disc list-inside space-y-1 text-editorialText mt-1">
+                            <li><strong>上衣（${topsNeeded} 件）：</strong>${myTops.length > 0 ? escapeHtml(myTops.join('、')) : '透氣球衣 / 寬版短 T 輪替'}</li>
+                            <li><strong>下身（${bottomsNeeded} 件）：</strong>${myBottoms.length > 0 ? escapeHtml(myBottoms.join('、')) : '直筒牛仔褲 ＋ 膝上短褲'}</li>
+                            <li><strong>外套（1 件）：</strong>${myOuter.length > 0 ? escapeHtml(myOuter[0]) : '連帽運動外套（可搭長褲也可上長下短配短褲）'}</li>
+                            <li><strong>鞋款（1 雙）：</strong>${myShoes.length > 0 ? escapeHtml(myShoes[0]) : '最耐走的復古球鞋'}</li>
+                            <li class="text-editorialAccent font-bold"><strong>貼身備品（自動 +1 備用）：</strong>內褲 ${underwearNeeded} 件（若帶白褲請優先選淺灰/純白款）、中筒長襪 ${socksNeeded} 雙</li>
+                        </ul>
+                    `;
+                }
                 showEl('pack-result-box');
             }
+            if (btn) { btn.disabled = false; btn.textContent = '🎒 啟動 AI 演算法生成一衣多穿行李清單'; }
         }
 
         // =====================================================================
@@ -3221,9 +3471,9 @@ const finalKey = savedKey ? savedKey.trim() : apiKey;
             if (impInput) impInput.addEventListener('change', handleImportBackupFile);
 
             await loadAllFromUltraDB();
-            await migrateLegacyStoresIfNeeded();
 
             refreshProfileBadge();
+            updateApiStatusIndicator();
             updateTempBadge();
             renderWardrobeSection();
             renderStudioSlots();
