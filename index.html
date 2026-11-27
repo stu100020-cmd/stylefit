@@ -1384,9 +1384,9 @@
             }
         }
 
-      const MODEL_CANDIDATES = ['gemini-3.8-flash', 'gemini-3.0-flash', 'gemini-2.5-flash-lite'];
+      const MODEL_CANDIDATES = ['gemini-3.8-flash', 'gemini-3.8-flash-lite', 'gemini-2.5-flash-lite'];
 
-        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 1) {
+        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 0) {
             const finalKey = resolveApiKey();
             if (!finalKey) return null;
 
@@ -1411,6 +1411,7 @@ const url = apiBase + modelName + ':generateContent';
                     try {
                         const res = await fetch(url, {
                             method: 'POST',
+                            signal: AbortSignal.timeout(8000),
                             headers: {
                                 'Content-Type': 'application/json',
                                 'x-goog-api-key': finalKey
