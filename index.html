@@ -1384,9 +1384,9 @@
             }
         }
 
-        const MODEL_CANDIDATES = ['gemini-3.8-flash', 'gemini-2.5-flash'];
+       const MODEL_CANDIDATES = ['gemini-2.5-flash'];
 
-        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 2) {
+        async function callGeminiAPI(promptText, base64Images = [], maxRetries = 1) {
             const finalKey = resolveApiKey();
             if (!finalKey) return null;
 
@@ -1425,10 +1425,10 @@ const url = apiBase + modelName + ':generateContent';
                         });
 
                         if (res.status === 429 || res.status === 503) {
-                            const waitMs = 2000 * Math.pow(2, attempt);
-                            await new Promise(r => setTimeout(r, waitMs));
-                            continue;
-                        }
+    if (attempt >= 1) throw new Error(`伺服器忙碌中 (${res.status})，請稍後幾秒再試`);
+    await new Promise(r => setTimeout(r, 1000));
+    continue;
+}
 
                         if (!res.ok) {
                             const errBody = await res.json().catch(() => ({}));
