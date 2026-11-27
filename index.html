@@ -1247,7 +1247,7 @@
         }
 
         function resolvePreferredModel() {
-            try { return localStorage.getItem(APIMODEL_LS_KEY) || 'gemini-3.8-flash-lite'; } catch (e) { return 'gemini-3.8-flash-lite'; }
+            try { return localStorage.getItem(APIMODEL_LS_KEY) || 'gemini-3.8-flash'; } catch (e) { return 'gemini-3.8-flash'; }
         }
 
         function updateApiStatusIndicator() {
@@ -1281,9 +1281,9 @@
             }
 
             const pref = resolvePreferredModel();
-            const candidates = Array.from(new Set([pref, 'gemini-3.8-flash-lite', 'gemini-3.8-pro']));
+            const candidates = Array.from(new Set([pref, 'gemini-3.8-flash', 'gemini-3.8-pro']));
             let lastError = null;
-            const searchModes = [false];
+            const searchModes =[true, false];
 
             for (const enableGrounding of searchModes) {
                 for (const modelName of candidates) {
@@ -1528,7 +1528,7 @@
 
         function saveCustomApiKey() {
             const val = (getEl('apikey-input')?.value || '').trim();
-            const mod = (getEl('apimodel-select')?.value || 'gemini-3.8-flash-lite').trim();
+            const mod = (getEl('apimodel-select')?.value || 'gemini-3.8-flash').trim();
             try { localStorage.setItem(APIKEY_LS_KEY, val); localStorage.setItem(APIMODEL_LS_KEY, mod); } catch (e) {}
             updateApiStatusIndicator();
             closeModal('apikey-modal');
